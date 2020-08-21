@@ -1,60 +1,6 @@
-from abc import ABC, abstractmethod
+from .base import Shape, Reference
 
 import gdspy
-import numpy as np
-from .helpers import Reference
-
-
-class Shape(ABC):
-    def __init__(self):
-        self._n_elements = 0
-        self._reference = Reference()
-        self._shape = gdspy.PolygonSet([])
-        self._draw()
-
-    def translate(self, dx, dy):
-        self._shape.translate(dx, dy)
-        self._reference.translate(dx, dy)
-        return self
-
-    def rotate(self, radians, center=(0, 0)):
-        self._shape.rotate(radians, center)
-        self._reference.rotate(radians, center)
-        return self
-
-    def scale(self, scalex, scaley=None, center=(0, 0)):
-        self._shape.scale(scalex, scaley, center)
-        self._reference.scale(scalex, scaley, center)
-        return self
-
-    def mirror(self, p1, p2=(0, 0)):
-        self._shape.mirror(p1, p2)
-        self._reference.mirror(p1, p2)
-        return self
-
-    def add(self, element, position=None):
-        self._n_elements += 1
-        if position is not None:
-            element.translate(position[0], position[1])
-        self._shape = gdspy.boolean(self._shape, element.shape, "or")
-
-    def add_reference(self, name, point):
-        self._reference.add(name, point)
-
-    def _draw(self):
-        pass
-
-    @property
-    def shape(self):
-        return self._shape
-
-    @property
-    def polygons(self):
-        return self.shape.polygons
-
-    @property
-    def points(self):
-        return self._reference.points
 
 
 class Square(Shape):
