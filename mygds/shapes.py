@@ -1,6 +1,9 @@
 from .base import Shape, Reference
 
 import gdspy
+import numpy as np
+
+PI = np.pi
 
 
 class Square(Shape):
@@ -38,11 +41,12 @@ class Marker(Shape):
 
 
 class MarkerField(Shape):
-    def __init__(self, size, nx, ny, pitch):
+    def __init__(self, size, nx, ny, pitch, label=False):
         self._size = size
         self._nx = nx
         self._ny = ny
         self._pitch = pitch
+        self._with_label = label
         super().__init__()
 
     def _draw(self):
@@ -51,3 +55,39 @@ class MarkerField(Shape):
                 position = (i * self._pitch, j * self._pitch)
                 self.add(Marker(self._size), position=position)
                 self.add_reference(f"MARKER_{i+1}_{j+1}", position)
+                if self._with_label:
+                    self.add(
+                        gdspy.Text(
+                            f"{i+1}",
+                            2 * self._size,
+                            position=(position[0] - 1.5 * self._size, position[1]),
+                        )
+                    )
+                    if j != i:
+                        self.add(
+                            gdspy.Text(
+                                f"{j+1}",
+                                2 * self._size,
+                                position=(
+                                    position[0] + 0.5 * self._size,
+                                    position[1] - 2.5 * self._size,
+                                ),
+                            )
+                        )
+
+    def add_corners(self):
+        angle = Shape()
+        angle.add(
+            Rectangle(self._size, 4 * self._size), position=(self._size, self._size)
+        )
+        angle.add(
+            Rectangle(4 * self._size, self._size), position=(self._size, self._size)
+        )
+        cross = Shape()
+        for i in range(4):
+            cross.add(angle.rotate(i * PI / 2))
+
+        corners = [(1, 1), (1, self._nx), (self._nx, self._ny), (self._nx, 1)]
+        for i, j in corners:
+            self.add(cross, position=self.points[f"MARKER_{i}_{j}"])
+
