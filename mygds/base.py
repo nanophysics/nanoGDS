@@ -32,13 +32,14 @@ class Shape:
         self._reference.mirror(p1, p2)
         return self
 
-    def add(self, element, position=None):
-        self._n_elements += 1
+    def add(self, element, position=None, add_refs=False, counter=None):
         element = deepcopy(element)
         if position is not None:
             element.translate(position[0], position[1])
         if isinstance(element, Shape):
             self._shape = gdspy.boolean(self._shape, element.shape, "or")
+            if add_refs:
+                self._merge_references(element, counter)
         elif isinstance(element, gdspy.polygon.PolygonSet):
             self._shape = gdspy.boolean(self._shape, element, "or")
         else:
@@ -48,6 +49,17 @@ class Shape:
 
     def add_reference(self, name, point):
         self._reference.add(name, point)
+
+    def _merge_references(self, element, counter):
+        for name, point in element.points.items():
+            if name == "ORIGIN":
+                continue
+
+            new_name = f"{type(element).__name__.upper()}"
+            if counter is not None:
+                new_name += f" #{counter}"
+            new_name += f" {name}"
+            self.add_reference(new_name, point)
 
     def _draw(self):
         pass
