@@ -1,12 +1,15 @@
 import gdspy
 import numpy as np
 
+from copy import deepcopy
+
 
 class Shape:
     def __init__(self):
         self._n_elements = 0
         self._reference = Reference()
         self._shape = gdspy.PolygonSet([])
+        self.add_reference("ORIGIN", (0, 0))
         self._draw()
 
     def translate(self, dx, dy):
@@ -31,9 +34,17 @@ class Shape:
 
     def add(self, element, position=None):
         self._n_elements += 1
+        element = deepcopy(element)
         if position is not None:
             element.translate(position[0], position[1])
-        self._shape = gdspy.boolean(self._shape, element.shape, "or")
+        if isinstance(element, Shape):
+            self._shape = gdspy.boolean(self._shape, element.shape, "or")
+        elif isinstance(element, gdspy.polygon.PolygonSet):
+            self._shape = gdspy.boolean(self._shape, element, "or")
+        else:
+            raise Exception(
+                "Element to add needs to be either a `Shape` or `gdspy.PolygonSet`"
+            )
 
     def add_reference(self, name, point):
         self._reference.add(name, point)
