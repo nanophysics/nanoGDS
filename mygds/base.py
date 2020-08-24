@@ -42,6 +42,8 @@ class Shape:
                 self._merge_references(element, counter)
         elif isinstance(element, gdspy.polygon.PolygonSet):
             self._shape = gdspy.boolean(self._shape, element, "or")
+        elif isinstance(element, gdspy.FlexPath):
+            self._shape = gdspy.boolean(self._shape, element.get_polygons(), "or")
         else:
             raise Exception(
                 "Element to add needs to be either a `Shape` or `gdspy.PolygonSet`"
