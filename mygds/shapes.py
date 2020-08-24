@@ -120,16 +120,47 @@ class Bondpad(Shape):
 
 
 class BondpadRow(Shape):
-    def __init__(self, n=5, start=0, stop=1000, pad_width=100, pad_height=100):
-        self._n = n
-        self._start = start
-        self._stop = stop
+    def __init__(self, positions, pad_width=200, pad_height=300):
+        self._positions = positions
         self._pad_width = pad_width
         self._pad_height = pad_height
         super().__init__()
 
     def _draw(self):
-        for i, x in enumerate(np.linspace(self._start, self._stop, self._n)):
+        for i, x in enumerate(self._positions):
             bondpad = Bondpad(self._pad_width, self._pad_height)
             self.add(bondpad, position=[x, 0], add_refs=True, counter=i + 1)
+
+
+class Lead(Shape):
+    def __init__(self, points, widths):
+        if len(points) < 2:
+            raise Exception("Specify at least 2 points.")
+        self._path = points
+        self._widths = widths
+        super().__init__()
+
+    def _draw(self):
+        path = gdspy.FlexPath([self._path[0]], self._widths[0], ends="extended")
+        for p, w in zip(self._path[1:], self._widths[1:]):
+            path.segment(p, width=w)
+        self.add(path)
+        self.add_reference("START", self._path[0])
+        self.add_reference("END", self._path[-1])
+
+
+class LeadRow(Shape):
+    def __init__(self, point_list, widths):
+        self._point_list = point_list
+        self._widths = widths
+        super().__init__()
+
+    def _draw(self):
+        n_leads = len(self._point_list[0])
+        for i in range(n_leads):
+            points = []
+            for lst in self._point_list:
+                points.append(lst[i])
+            lead = Lead(points, self._widths)
+            self.add(lead)
 
