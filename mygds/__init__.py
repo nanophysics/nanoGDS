@@ -1,4 +1,4 @@
-from .base import Shape
+from .base import GDS, Shape
 from .shapes import (
     Square,
     Rectangle,
@@ -10,4 +10,4 @@ from .shapes import (
     Lead,
     LeadRow,
 )
-from .helpers import Chip
+from helpers import *

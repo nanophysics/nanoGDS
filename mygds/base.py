@@ -1,53 +1,98 @@
 import gdspy
 import numpy as np
+import mygds
 
 from copy import deepcopy
+
+
+class GDS:
+    def __init__(self):
+        self._lib = gdspy.GdsLibrary()
+        self._main_cell = self._lib.new_cell("MAIN")
+
+    def add_cell(self, name, shapes, origin=(0, 0)):
+        cell = gdspy.Cell(name)
+        if isinstance(shapes, list):
+            for s in shapes:
+                cell = self._add_element_to_cell(cell, s, origin)
+        else:
+            cell = self._add_element_to_cell(cell, shapes, origin)
+        self._main_cell.add(cell)
+
+    def _add_element_to_cell(self, cell, element, origin):
+        element = deepcopy(element)
+        element.translate(origin[0], origin[1])
+        if isinstance(element, mygds.Shape):
+            cell.add(element.shapes)
+        else:
+            cell.add(element)
+        return cell
+
+    def save(self, name):
+        self._lib.write_gds(f"{name}.gds")
 
 
 class Shape:
     def __init__(self):
         self._n_elements = 0
         self._reference = Reference()
-        self._shape = gdspy.PolygonSet([])
+        self._shapes = {}
         self.add_reference("ORIGIN", (0, 0))
         self._draw()
 
     def translate(self, dx, dy):
-        self._shape.translate(dx, dy)
+        for shape in self._shapes.values():
+            shape.translate(dx, dy)
         self._reference.translate(dx, dy)
         return self
 
     def rotate(self, radians, center=(0, 0)):
-        self._shape.rotate(radians, center)
+        for shape in self._shapes.values():
+            shape.rotate(radians, center)
         self._reference.rotate(radians, center)
         return self
 
     def scale(self, scalex, scaley=None, center=(0, 0)):
-        self._shape.scale(scalex, scaley, center)
+        for shape in self._shapes.values():
+            shape.scale(scalex, scaley, center)
         self._reference.scale(scalex, scaley, center)
         return self
 
     def mirror(self, p1, p2=(0, 0)):
-        self._shape.mirror(p1, p2)
+        for shape in self._shapes.values():
+            shape.mirror(p1, p2)
         self._reference.mirror(p1, p2)
         return self
 
-    def add(self, element, position=None, add_refs=False, counter=None):
+    def add(
+        self, element, position=None, angle=None, layer=0, add_refs=False, counter=None,
+    ):
         element = deepcopy(element)
+        if angle is not None:
+            element.rotate(angle)
         if position is not None:
             element.translate(position[0], position[1])
+
         if isinstance(element, Shape):
-            self._shape = gdspy.boolean(self._shape, element.shape, "or")
+            for l in element.layers:
+                self._add_polygonset(element._shapes[l], layer=l)
             if add_refs:
                 self._merge_references(element, counter)
         elif isinstance(element, gdspy.polygon.PolygonSet):
-            self._shape = gdspy.boolean(self._shape, element, "or")
+            self._add_polygonset(element, layer)
         elif isinstance(element, gdspy.FlexPath):
-            self._shape = gdspy.boolean(self._shape, element.get_polygons(), "or")
+            self._add_polygonset(element.get_polygons(), layer)
         else:
             raise Exception(
                 "Element to add needs to be either a `Shape` or `gdspy.PolygonSet`"
             )
+
+    def _add_polygonset(self, element, layer=0):
+        if layer not in self._shapes.keys():
+            self._shapes[layer] = gdspy.PolygonSet([], layer=layer)  # new layer
+        self._shapes[layer] = gdspy.boolean(
+            self._shapes[layer], element, "or", layer=layer
+        )
 
     def add_reference(self, name, point):
         self._reference.add(name, point)
@@ -56,7 +101,6 @@ class Shape:
         for name, point in element.points.items():
             if name == "ORIGIN":
                 continue
-
             new_name = f"{type(element).__name__.upper()}"
             if counter is not None:
                 new_name += f" #{counter}"
@@ -67,12 +111,16 @@ class Shape:
         pass
 
     @property
-    def shape(self):
-        return self._shape
+    def shapes(self):
+        return list(self._shapes.values())
+
+    @property
+    def layers(self):
+        return list(self._shapes.keys())
 
     @property
     def polygons(self):
-        return self.shape.polygons
+        return [shape.polygons for shape in self._shapes.values()]
 
     @property
     def points(self):
@@ -118,3 +166,4 @@ class Reference:
     @property
     def points(self):
         return self._points
+
