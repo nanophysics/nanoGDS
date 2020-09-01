@@ -1,4 +1,4 @@
-from .base import GDS, Shape
+from .base import GDS, FourInchWafer, Shape
 from .shapes import (
     Square,
     Rectangle,

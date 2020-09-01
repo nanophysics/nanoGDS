@@ -32,6 +32,43 @@ class GDS:
         self._lib.write_gds(f"{name}.gds")
 
 
+class FourInchWafer:
+    def __init__(
+        self, path_to_template="C:\\Users\\maxru\\PhD\\Code\\mygds\\template.gds"
+    ):
+        self._lib = gdspy.GdsLibrary(infile=path_to_template)
+
+    def add_reference(self, name, shape, add_to):
+        newcell = self._lib.new_cell(name)
+        newcell.add(shape)
+        newcell_ref = gdspy.CellReference(newcell)
+        counter = 0
+        for ref in self._lib.cells["Template"].references:
+            if ref.ref_cell.name in add_to:
+                ref.ref_cell.add(newcell_ref)
+                counter += 1
+                print(
+                    f"{counter}: Added reference to cell '{name}' to '{ref.ref_cell.name}'"
+                )
+
+    def add_reference_to_all(self, name, shape):
+        newcell = self._lib.new_cell(name)
+        newcell.add(shape)
+        newcell_ref = gdspy.CellReference(newcell)
+        counter = 0
+        for ref in self._lib.cells["Template"].references:
+            if ref.ref_cell.name.startswith("WAFER_RING"):
+                continue
+            ref.ref_cell.add(newcell_ref)
+            counter += 1
+            print(
+                f"{counter}: Added reference to cell '{name}' to '{ref.ref_cell.name}'"
+            )
+
+    def write(self, name):
+        self._lib.write_gds(f"{name}.gds")
+
+
 class Shape:
     def __init__(self):
         self._n_elements = 0
