@@ -184,14 +184,17 @@ class Lead(Shape):
         super().__init__()
 
     def _draw(self):
+        # first layer
         path = gdspy.FlexPath([self._path[0]], self._widths[0])
         for p, w in zip(self._path[1:], self._widths[1:]):
             path.segment(p, width=w)
         self.add(path, layer=self._layer)
-        points = self._path[:2]
-        self.add(
-            gdspy.FlexPath(points, self._widths[0]), layer=self._layer_bondpad,
-        )
+        # add second layer for thicker bondpads
+        path = gdspy.FlexPath([self._path[0]], self._widths[0] - 20)
+        for p, w in zip(self._path[1:3], self._widths[1:3]):
+            path.segment(p, width=w - 20)
+        self.add(path, layer=self._layer_bondpad)
+        # add references
         self.add_reference("START", self._path[0])
         self.add_reference("END", self._path[-1])
 
