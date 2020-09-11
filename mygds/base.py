@@ -39,7 +39,7 @@ class FourInchWafer:
         self._lib = gdspy.GdsLibrary(infile=path_to_template)
 
     def add_reference(self, name, shape, add_to):
-        newcell = self._lib.new_cell(name)
+        newcell = self._lib.new_cell(name, overwrite_duplicate=True)
         newcell.add(shape)
         newcell_ref = gdspy.CellReference(newcell)
         counter = 0
@@ -51,8 +51,22 @@ class FourInchWafer:
                     f"{counter}: Added reference to cell '{name}' to '{ref.ref_cell.name}'"
                 )
 
+    def add_reference_by_columns(self, name, shape, columns):
+        newcell = self._lib.new_cell(name, overwrite_duplicate=True)
+        newcell.add(shape)
+        newcell_ref = gdspy.CellReference(newcell)
+        counter = 0
+        for ref in self._lib.cells["Template"].references:
+            for column in columns:
+                if ref.ref_cell.name.startswith(column):
+                    ref.ref_cell.add(newcell_ref)
+                    counter += 1
+                    print(
+                        f"{counter}: Added reference to cell '{name}' to '{ref.ref_cell.name}'"
+                    )
+
     def add_reference_to_all(self, name, shape):
-        newcell = self._lib.new_cell(name)
+        newcell = self._lib.new_cell(name, overwrite_duplicate=True)
         newcell.add(shape)
         newcell_ref = gdspy.CellReference(newcell)
         counter = 0
