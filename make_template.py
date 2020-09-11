@@ -1,7 +1,6 @@
 import mygds
 import gdspy
 import numpy as np
-import helpers
 import string
 
 PI = np.pi
@@ -11,22 +10,20 @@ if __name__ == "__main__":
     layer = 1
     layer2 = 2
     radius = 50000
-    radius_offset = 1000
+    radius_offset = 500
 
-    die_size = (8000, 4000)
+    die_size = (9000, 5000)
     wafer_mapping = [
-        range(4),
+        range(8),
         range(12),
+        range(16),
         range(18),
-        range(20),
-        range(22),
-        range(24),
-        range(24),
-        range(22),
-        range(20),
         range(18),
+        range(18),
+        range(18),
+        range(16),
         range(12),
-        range(4),
+        range(8),
     ]
 
     print("TEST")
@@ -45,8 +42,14 @@ if __name__ == "__main__":
         layer=layer2,
     )
 
-    cross = mygds.Cross(1000, 50, layer=layer)
     dicing = mygds.Shape()
+    cross = mygds.Cross(1000, 50, layer=layer)
+    dicing.add(cross, position=(0, 0))
+    dicing.add(cross, position=(die_size[0], 0))
+    dicing.add(cross, position=(die_size[0], die_size[1]))
+    dicing.add(cross, position=(0, die_size[1]))
+
+    cross = mygds.Cross(1000, 50, layer=layer2)
     dicing.add(cross, position=(0, 0))
     dicing.add(cross, position=(die_size[0], 0))
     dicing.add(cross, position=(die_size[0], die_size[1]))
