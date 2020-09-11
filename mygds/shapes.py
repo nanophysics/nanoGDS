@@ -69,11 +69,12 @@ class Marker(Shape):
 
 
 class MarkerField(Shape):
-    def __init__(self, size, nx, ny, pitch, label=False, layer=0):
+    def __init__(self, size, nx, ny, pitch, pitchy=None, label=False, layer=0):
         self._size = size
         self._nx = nx
         self._ny = ny
         self._pitch = pitch
+        self._pitchy = pitch if pitchy is None else pitchy
         self._with_label = label
         self._layer = layer
         super().__init__()
@@ -81,7 +82,7 @@ class MarkerField(Shape):
     def _draw(self):
         for i in range(self._nx):
             for j in range(self._ny):
-                position = (i * self._pitch, j * self._pitch)
+                position = (i * self._pitch, j * self._pitchy)
                 self.add(
                     Marker(self._size, layer=self._layer), position=position,
                 )
