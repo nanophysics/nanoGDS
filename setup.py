@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mygds",
-    description="Zurich Instruments tools for high level device control",
+    description="",
     long_description=long_description,
     long_description_content_type="text/markdown",
     # url="https://github.com/zhinst/zhinst-toolkit",
@@ -32,7 +32,7 @@ setuptools.setup(
         "Topic :: Scientific/Engineering",
     ],
     keywords="gds gdspy",
-    packages=setuptools.find_namespace_packages(exclude=[], include=["mygds.*"]),
+    packages=["mygds"],
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
     install_requires=requirements,
