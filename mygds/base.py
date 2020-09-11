@@ -34,7 +34,8 @@ class GDS:
 
 class FourInchWafer:
     def __init__(
-        self, path_to_template="C:\\Users\\maxru\\PhD\\Code\\mygds\\template.gds"
+        self,
+        path_to_template="C:\\Users\\maxru\\PhD\\Code\\mygds\\mygds\\resources\\template.gds",
     ):
         self._lib = gdspy.GdsLibrary(infile=path_to_template)
 
