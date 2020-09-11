@@ -1,5 +1,9 @@
-.gitignore
 test
 test.*
 *.pyc
 settings.json
+/build
+/dist
+/.eggs
+/__pycache__
+/.vscode
