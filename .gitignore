@@ -1,6 +1,7 @@
 test
 test.*
 *.pyc
+*.egg-info
 settings.json
 /build
 /dist
