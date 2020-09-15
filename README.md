@@ -5,6 +5,8 @@ Python package for designing simple GDS shapes building on `gdspy`.
 ## Install
 
 ```
+git clone https://github.com/nanophysics/nanoGDS.git
+...
 cd nanogds
 python setup.py install
 ```
