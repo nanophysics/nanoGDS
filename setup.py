@@ -9,11 +9,11 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="mygds",
+    name="nanogds",
     description="",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    # url="https://github.com/zhinst/zhinst-toolkit",
+    url="https://github.com/nanophysics/nanoGDS",
     author="Max Ruckriegel",
     author_email="maxr@ethz.ch",
     license="MIT",
@@ -32,7 +32,7 @@ setuptools.setup(
         "Topic :: Scientific/Engineering",
     ],
     keywords="gds gdspy",
-    packages=["mygds"],
+    packages=["nanogds"],
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
     install_requires=requirements,

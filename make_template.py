@@ -1,4 +1,4 @@
-import mygds
+import nanogds
 import gdspy
 import numpy as np
 import string
@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     print("TEST")
 
-    ring = mygds.Shape()
+    ring = nanogds.Shape()
     ring.add(
         gdspy.Round(
             (0, 0), radius + radius_offset, inner_radius=radius - radius_offset
@@ -42,14 +42,14 @@ if __name__ == "__main__":
         layer=layer2,
     )
 
-    dicing = mygds.Shape()
-    cross = mygds.Cross(1000, 50, layer=layer)
+    dicing = nanogds.Shape()
+    cross = nanogds.Cross(1000, 50, layer=layer)
     dicing.add(cross, position=(0, 0))
     dicing.add(cross, position=(die_size[0], 0))
     dicing.add(cross, position=(die_size[0], die_size[1]))
     dicing.add(cross, position=(0, die_size[1]))
 
-    cross = mygds.Cross(1000, 50, layer=layer2)
+    cross = nanogds.Cross(1000, 50, layer=layer2)
     dicing.add(cross, position=(0, 0))
     dicing.add(cross, position=(die_size[0], 0))
     dicing.add(cross, position=(die_size[0], die_size[1]))

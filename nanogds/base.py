@@ -1,7 +1,5 @@
 import gdspy
 import numpy as np
-import mygds
-
 from copy import deepcopy
 
 
@@ -22,7 +20,7 @@ class GDS:
     def _add_element_to_cell(self, cell, element, origin):
         element = deepcopy(element)
         element.translate(origin[0], origin[1])
-        if isinstance(element, mygds.Shape):
+        if isinstance(element, Shape):
             cell.add(element.shapes)
         else:
             cell.add(element)
