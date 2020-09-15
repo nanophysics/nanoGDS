@@ -32,12 +32,13 @@ print(shape.points)
 
 >>> {'ORIGIN': array([0, 0]), 'RECTANGLE #1 TOPRIGHT': array([2, 3])}
 
-s.add(
+shape.add(
     mygds.Rectangle(3, 4), 
-    position=s.points["RECTANGLE #1 TOPRIGHT"], 
+    position=shape.points["RECTANGLE #1 TOPRIGHT"], 
     add_refs=True, 
     counter=2
 )
 
 >>> {'ORIGIN': array([0, 0]), 'RECTANGLE #1 TOPRIGHT': array([2, 3]), 'RECTANGLE #2 TOPRIGHT': array([5, 7])}
 ```
+
