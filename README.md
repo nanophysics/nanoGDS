@@ -20,7 +20,7 @@ import nanogds
 import gdspy
 
 shape = nanogds.Shape()
-shape.add(mygds.Rectangle(2, 3))
+shape.add(nanogds.Rectangle(2, 3))
 
 shape.add(nanogds.Rectangle(4, 5), position=(10, 10), angle=45)
 
