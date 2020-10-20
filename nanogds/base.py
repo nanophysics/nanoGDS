@@ -115,7 +115,14 @@ class Shape:
         return self
 
     def add(
-        self, element, position=None, angle=None, layer=0, add_refs=False, counter=None,
+        self,
+        element,
+        position=None,
+        angle=None,
+        layer=0,
+        add_refs=False,
+        counter=None,
+        operation="or",
     ):
         element = deepcopy(element)
         if angle is not None:
@@ -125,23 +132,26 @@ class Shape:
 
         if isinstance(element, Shape):
             for l in element.layers:
-                self._add_polygonset(element._shapes[l], layer=l)
+                self._add_polygonset(element._shapes[l], layer=l, operation=operation)
             if add_refs:
                 self._merge_references(element, counter)
         elif isinstance(element, gdspy.polygon.PolygonSet):
-            self._add_polygonset(element, layer)
+            self._add_polygonset(element, layer, operation=operation)
         elif isinstance(element, gdspy.FlexPath):
-            self._add_polygonset(element.get_polygons(), layer)
+            self._add_polygonset(element.get_polygons(), layer, operation=operation)
         else:
             raise Exception(
                 "Element to add needs to be either a `Shape` or `gdspy.PolygonSet`"
             )
 
-    def _add_polygonset(self, element, layer=0):
+    def _add_polygonset(self, element, layer=0, operation="or"):
+        operation = operation.lower()
+        if operation not in ["or", "and", "not"]:
+            raise Exception(f"Unknown operation '{operation}'")
         if layer not in self._shapes.keys():
             self._shapes[layer] = gdspy.PolygonSet([], layer=layer)  # new layer
         self._shapes[layer] = gdspy.boolean(
-            self._shapes[layer], element, "or", layer=layer
+            self._shapes[layer], element, operation, layer=layer
         )
 
     def add_reference(self, name, point):
