@@ -99,3 +99,21 @@ class CoplanarPath(CoplanarShape):
     @property
     def length(self):
         return self._center_path.length
+
+
+class RectangleCapacitor(CoplanarShape):
+    def __init__(self, x, y, gap):
+        self._x, self._y = x, y
+        self._gap = gap
+        super().__init__()
+
+    def _draw(self):
+        x1, y1 = self._x, self._y
+        x2, y2 = self._x + 2 * self._gap, self._y + 2 * self._gap
+        x3, y3 = self._x + 3 * self._gap, self._y + 3 * self._gap
+
+        self.add_to_center(Rectangle(x1, y1).translate(-x1 / 2, -y1 / 2))
+        self.add_to_outer(Rectangle(x2, y2).translate(-x2 / 2, -y2 / 2))
+        self.add_to_outer(Rectangle(x3, y3).translate(-x3 / 2, -y3 / 2))
+        super()._draw()
+        # self.translate(-self._x / 2, -self._y / 2)
