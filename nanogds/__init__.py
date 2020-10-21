@@ -10,4 +10,4 @@ from .shapes import (
     Lead,
     LeadRow,
 )
-from .coplanar_shapes import CoplanarShape, CoplanarPath
+from .coplanar_shapes import CoplanarShape, CoplanarFlexPath, CoplanarPath
