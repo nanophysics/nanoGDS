@@ -15,4 +15,5 @@ from .coplanar_shapes import (
     CoplanarFlexPath,
     CoplanarPath,
     RectangleCapacitor,
+    Bondpad,
 )

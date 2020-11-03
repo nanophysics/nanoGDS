@@ -40,6 +40,30 @@ class CoplanarShape(Shape):
         self._ground += shape._ground
         self._draw()
 
+    def translate(self, dx, dy):
+        for lst in [self._center, self._outer, self._ground]:
+            for shape in lst:
+                shape.translate(dx, dy)
+        return self
+
+    def rotate(self, radians, center=(0, 0)):
+        for lst in [self._center, self._outer, self._ground]:
+            for shape in lst:
+                shape.rotate(radians, center)
+        return self
+
+    def scale(self, scalex, scaley=None, center=(0, 0)):
+        for lst in [self._center, self._outer, self._ground]:
+            for shape in lst:
+                shape.scale(scalex, scaley, center)
+        return self
+
+    def mirror(self, p1, p2=(0, 0)):
+        for shape in self._shapes.values():
+            shape.mirror(p1, p2)
+        self._reference.mirror(p1, p2)
+        return self
+
 
 class CoplanarFlexPath(CoplanarShape):
     def __init__(self, points, width_center, width_gap, radius):
@@ -114,6 +138,45 @@ class RectangleCapacitor(CoplanarShape):
 
         self.add_to_center(Rectangle(x1, y1).translate(-x1 / 2, -y1 / 2))
         self.add_to_outer(Rectangle(x2, y2).translate(-x2 / 2, -y2 / 2))
-        self.add_to_outer(Rectangle(x3, y3).translate(-x3 / 2, -y3 / 2))
+        self.add_to_ground(Rectangle(x3, y3).translate(-x3 / 2, -y3 / 2))
         super()._draw()
-        # self.translate(-self._x / 2, -self._y / 2)
+
+
+class Bondpad(CoplanarShape):
+    def __init__(self, width, length, gap, taper_length, taper_width, taper_gap):
+        self._width = width
+        self._length = length
+        self._gap = gap
+        self._taper_length = taper_length
+        self._taper_width = taper_width
+        self._taper_gap = taper_gap
+        super().__init__()
+
+    def _get_path(self, w1, w2, l1, l2):
+        path = gdspy.Path(w1)
+        path.segment(l1, final_width=w1)
+        path.segment(l2, final_width=w2)
+        return path
+
+    def _draw(self):
+        path_center = self._get_path(
+            self._width, self._taper_width, self._length, self._taper_length
+        )
+        path_outer = self._get_path(
+            self._width + 2 * self._gap,
+            self._taper_width + 2 * self._taper_gap,
+            self._length + self._gap,
+            self._taper_length,
+        )
+        path_ground = self._get_path(
+            self._width + 6 * self._gap,
+            self._taper_width + 6 * self._taper_gap,
+            self._length + 3 * self._gap,
+            self._taper_length,
+        )
+        self.add_to_center(path_center)
+        self.add_to_outer(path_outer.translate(-self._gap, 0))
+        self.add_to_ground(path_ground.translate(-3 * self._gap, 0))
+        super()._draw()
+        self.translate(-path_center.x, -path_center.y)
+
