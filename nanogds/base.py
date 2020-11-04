@@ -84,7 +84,6 @@ class FourInchWafer:
 
 class Shape:
     def __init__(self):
-        self._n_elements = 0
         self._reference = Reference()
         self._shapes = {}
         self.add_reference("ORIGIN", (0, 0))
@@ -169,6 +168,11 @@ class Shape:
 
     def _draw(self):
         pass
+
+    def _reset(self):
+        self._reference = Reference()
+        self._shapes = {}
+        self.add_reference("ORIGIN", (0, 0))
 
     @property
     def shapes(self):

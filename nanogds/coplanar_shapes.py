@@ -15,6 +15,7 @@ class CoplanarShape(Shape):
         super().__init__()
 
     def _draw(self):
+        self._reset()
         if self._ground:
             for shape in self._ground:
                 self.add(shape)
@@ -34,28 +35,34 @@ class CoplanarShape(Shape):
     def add_to_ground(self, shape):
         self._ground.append(shape)
 
-    def combine(self, shape):
+    def combine(self, shape, position=(0, 0), add_refs=False, counter=None):
+        shape.translate(position[0], position[1])
         self._center += shape._center
         self._outer += shape._outer
         self._ground += shape._ground
+        if add_refs:
+            self._merge_references(shape, counter)
         self._draw()
 
     def translate(self, dx, dy):
         for lst in [self._center, self._outer, self._ground]:
             for shape in lst:
                 shape.translate(dx, dy)
+        self._reference.translate(dx, dy)
         return self
 
     def rotate(self, radians, center=(0, 0)):
         for lst in [self._center, self._outer, self._ground]:
             for shape in lst:
                 shape.rotate(radians, center)
+        self._reference.rotate(radians, center)
         return self
 
     def scale(self, scalex, scaley=None, center=(0, 0)):
         for lst in [self._center, self._outer, self._ground]:
             for shape in lst:
                 shape.scale(scalex, scaley, center)
+        self._reference.scale(scalex, scaley, center)
         return self
 
     def mirror(self, p1, p2=(0, 0)):
@@ -177,6 +184,7 @@ class Bondpad(CoplanarShape):
         self.add_to_center(path_center)
         self.add_to_outer(path_outer.translate(-self._gap, 0))
         self.add_to_ground(path_ground.translate(-3 * self._gap, 0))
-        super()._draw()
         self.translate(-path_center.x, -path_center.y)
+        self.add_reference("END", (0, 0))
+        super()._draw()
 
