@@ -3,46 +3,62 @@ import numpy as np
 
 PI = np.pi
 
+
+def get_cpw(center_width, gap, radius):
+    path = nanogds.CoplanarPath(center_width, gap, radius)
+    path.segment(300, "-y")
+    path.turn("l")
+    path.segment(200)
+    path.turn("r")
+    path.segment(500)
+    path.turn("ll")
+    path.segment(200)
+    path.turn("rr")
+    path.segment(200)
+    path.turn("ll")
+    path.segment(500)
+    path.turn("r")
+    path.segment(200)
+    path.turn(-PI / 4)
+    path.segment(200)
+    path.turn(PI / 4)
+    path.segment(200)
+    path.turn(PI / 4)
+    path.segment(200)
+    path.turn(-PI / 4)
+    path.segment(300)
+    return path
+
+
 if __name__ == "__main__":
 
-    shape = nanogds.Shape()
+    shape = nanogds.CoplanarShape()
 
-    # path = nanogds.CoplanarPath(10, 20, 80)
-    # path.segment(500)
-    # path.turn("l")
-    # path.segment(500)
-    # path.turn("r")
-    # path.segment(500)
-    # path.turn(-1 / 4 * PI)
-    # path.segment(500)
-    # path.turn(-1 / 4 * PI)
-    # path.segment(500)
-    # path.turn(-1 / 4 * PI)
-    # path.segment(500)
-    # path.turn(-1 / 4 * PI)
-    # path.segment(1000)
-    # path.turn("r")
-    # path.segment(100)
-    # path.turn("ll")
-    # path.turn("r")
-    # path.segment(1000)
+    shape.add_to_ground(nanogds.Rectangle(4000, 2000).translate(-2000, -1000))
+    shape.add_to_outer(nanogds.Rectangle(600, 200).translate(-300, 900))
 
-    c = nanogds.RectangleCapacitor(100, 200, 20)
-    s = c.get_shape()
-    s.translate(1000, 500)
-    print(s.points)
+    ### define coplanar shapes to be used
 
-    bondpad = nanogds.Bondpad(200, 300, 20, 100, 20, 5)
-    b = bondpad.get_shape()
-    b.rotate(-PI / 2)
-    b.translate(-1000, 0)
+    # bondpad
+    bondpad = nanogds.Bondpad(200, 300, 50, 100, 10, 20)
+    bondpad.rotate(-PI / 2)
 
-    print(b.points)
+    # coplanar waveguide
+    path = get_cpw(10, 20, 80)
 
-    shape.add(b, add_refs=True, counter=1)
-    shape.add(s, position=shape.points["BONDPAD #1 END"], add_refs=True, counter=1)
+    ### combine coplanar shapes with main shape
+    shape.combine(bondpad, position=[-1000, 800], add_refs=True)
+    shape.combine(path, position=shape.points["BONDPAD END"], add_refs=True)
+    shape.combine(
+        bondpad.rotate(-PI / 2),
+        position=shape.points["COPLANARPATH END"],
+        connect_point=bondpad.points["END"],
+        add_refs=True,
+    )
+
     print(shape.points)
 
+    ### add shape as cell to gds file
     lib = nanogds.GDS()
-    lib.add_cell("TEST", shape)
+    lib.add_cell("TEST", shape.get_shape())
     lib.save("testchip")

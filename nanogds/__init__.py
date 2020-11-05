@@ -12,8 +12,7 @@ from .shapes import (
 )
 from .coplanar_shapes import (
     CoplanarShape,
-    # CoplanarFlexPath,
-    # CoplanarPath,
+    CoplanarPath,
     RectangleCapacitor,
     Bondpad,
 )
