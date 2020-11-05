@@ -84,6 +84,7 @@ class FourInchWafer:
 
 class Shape:
     def __init__(self):
+        self._name = ""
         self._reference = Reference()
         self._shapes = {}
         self.add_reference("ORIGIN", (0, 0))
@@ -160,7 +161,7 @@ class Shape:
         for name, point in element.points.items():
             if name == "ORIGIN":
                 continue
-            new_name = f"{type(element).__name__.upper()}"
+            new_name = element._name
             if counter is not None:
                 new_name += f" #{counter}"
             new_name += f" {name}"
@@ -168,11 +169,6 @@ class Shape:
 
     def _draw(self):
         pass
-
-    def _reset(self):
-        self._reference = Reference()
-        self._shapes = {}
-        self.add_reference("ORIGIN", (0, 0))
 
     @property
     def shapes(self):

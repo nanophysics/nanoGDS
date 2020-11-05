@@ -3,28 +3,17 @@ from .shapes import Rectangle
 
 import gdspy
 import numpy as np
+from copy import deepcopy
 
 PI = np.pi
 
 
-class CoplanarShape(Shape):
+class CoplanarShape:
     def __init__(self):
         self._center = []
         self._outer = []
         self._ground = []
-        super().__init__()
-
-    def _draw(self):
-        self._reset()
-        if self._ground:
-            for shape in self._ground:
-                self.add(shape)
-        if self._outer:
-            for shape in self._outer:
-                self.add(shape, operation="not")
-        if self._center:
-            for shape in self._center:
-                self.add(shape)
+        self._draw()
 
     def add_to_center(self, shape):
         self._center.append(shape)
@@ -35,101 +24,26 @@ class CoplanarShape(Shape):
     def add_to_ground(self, shape):
         self._ground.append(shape)
 
-    def combine(self, shape, position=(0, 0), add_refs=False, counter=None):
-        shape.translate(position[0], position[1])
-        self._center += shape._center
-        self._outer += shape._outer
-        self._ground += shape._ground
-        if add_refs:
-            self._merge_references(shape, counter)
-        self._draw()
-
-    def translate(self, dx, dy):
-        for lst in [self._center, self._outer, self._ground]:
-            for shape in lst:
-                shape.translate(dx, dy)
-        self._reference.translate(dx, dy)
-        return self
-
-    def rotate(self, radians, center=(0, 0)):
-        for lst in [self._center, self._outer, self._ground]:
-            for shape in lst:
-                shape.rotate(radians, center)
-        self._reference.rotate(radians, center)
-        return self
-
-    def scale(self, scalex, scaley=None, center=(0, 0)):
-        for lst in [self._center, self._outer, self._ground]:
-            for shape in lst:
-                shape.scale(scalex, scaley, center)
-        self._reference.scale(scalex, scaley, center)
-        return self
-
-    def mirror(self, p1, p2=(0, 0)):
-        for shape in self._shapes.values():
-            shape.mirror(p1, p2)
-        self._reference.mirror(p1, p2)
-        return self
-
-
-class CoplanarFlexPath(CoplanarShape):
-    def __init__(self, points, width_center, width_gap, radius):
-        super().__init__()
-        center = gdspy.FlexPath(
-            points, width_center, bend_radius=radius, corners="circular bend",
-        )
-        outer = gdspy.FlexPath(
-            points,
-            width_center + 2 * width_gap,
-            bend_radius=radius,
-            corners="circular bend",
-        )
-        ground = gdspy.FlexPath(
-            points,
-            3 * (width_center + 2 * width_gap),
-            bend_radius=radius,
-            corners="circular bend",
-        )
-        self.add_to_center(center)
-        self.add_to_outer(outer)
-        self.add_to_ground(ground)
-        self._draw()
-
-
-class CoplanarPath(CoplanarShape):
-    def __init__(self, width_center, width_gap, radius):
-        self._width_center = width_center
-        self._width_gap = width_gap
-        self._radius = radius
-        self._center_path = gdspy.Path(self._width_center)
-        self._outer_path = gdspy.Path(self._width_center + 2 * self._width_gap)
-        self._ground_path = gdspy.Path(3 * (self._width_center + 2 * self._width_gap))
-        self._path_is_empty = True
-        super().__init__()
+    def get_shape(self):
+        shape = Shape()
+        if self._ground:
+            for s in self._ground:
+                shape.add(s)
+        if self._outer:
+            for s in self._outer:
+                shape.add(s, operation="not")
+        if self._center:
+            for s in self._center:
+                shape.add(s)
+        self._define_references(shape)
+        shape._name = type(self).__name__.upper()
+        return shape
 
     def _draw(self):
-        self.add_to_ground(self._ground_path)
-        self.add_to_outer(self._outer_path)
-        self.add_to_center(self._center_path)
-        if not self._path_is_empty:
-            super()._draw()
-        self.add_reference("END", [self._center_path.x, self._center_path.y])
+        pass
 
-    def segment(self, *args, **kwargs):
-        for path in [self._ground_path, self._outer_path, self._center_path]:
-            path.segment(*args, **kwargs)
-        self._path_is_empty = False
-        self._draw()
-
-    def turn(self, *args, **kwargs):
-        for path in [self._ground_path, self._outer_path, self._center_path]:
-            path.turn(self._radius, *args, **kwargs)
-        self._path_is_empty = False
-        self._draw()
-
-    @property
-    def length(self):
-        return self._center_path.length
+    def _define_references(self, shape):
+        pass
 
 
 class RectangleCapacitor(CoplanarShape):
@@ -146,7 +60,69 @@ class RectangleCapacitor(CoplanarShape):
         self.add_to_center(Rectangle(x1, y1).translate(-x1 / 2, -y1 / 2))
         self.add_to_outer(Rectangle(x2, y2).translate(-x2 / 2, -y2 / 2))
         self.add_to_ground(Rectangle(x3, y3).translate(-x3 / 2, -y3 / 2))
-        super()._draw()
+
+    def _define_references(self, shape):
+        shape.add_reference("CENTER", [0, 0])
+
+
+# class CoplanarFlexPath(CoplanarShape):
+#     def __init__(self, points, width_center, width_gap, radius):
+#         super().__init__()
+#         center = gdspy.FlexPath(
+#             points, width_center, bend_radius=radius, corners="circular bend",
+#         )
+#         outer = gdspy.FlexPath(
+#             points,
+#             width_center + 2 * width_gap,
+#             bend_radius=radius,
+#             corners="circular bend",
+#         )
+#         ground = gdspy.FlexPath(
+#             points,
+#             3 * (width_center + 2 * width_gap),
+#             bend_radius=radius,
+#             corners="circular bend",
+#         )
+#         self.add_to_center(center)
+#         self.add_to_outer(outer)
+#         self.add_to_ground(ground)
+#         self._draw()
+
+
+# class CoplanarPath(CoplanarShape):
+#     def __init__(self, width_center, width_gap, radius):
+#         self._width_center = width_center
+#         self._width_gap = width_gap
+#         self._radius = radius
+#         self._center_path = gdspy.Path(self._width_center)
+#         self._outer_path = gdspy.Path(self._width_center + 2 * self._width_gap)
+#         self._ground_path = gdspy.Path(3 * (self._width_center + 2 * self._width_gap))
+#         self._path_is_empty = True
+#         super().__init__()
+
+#     def _draw(self):
+#         self.add_to_ground(self._ground_path)
+#         self.add_to_outer(self._outer_path)
+#         self.add_to_center(self._center_path)
+#         if not self._path_is_empty:
+#             super()._draw()
+#         self.add_reference("END", [self._center_path.x, self._center_path.y])
+
+#     def segment(self, *args, **kwargs):
+#         for path in [self._ground_path, self._outer_path, self._center_path]:
+#             path.segment(*args, **kwargs)
+#         self._path_is_empty = False
+#         self._draw()
+
+#     def turn(self, *args, **kwargs):
+#         for path in [self._ground_path, self._outer_path, self._center_path]:
+#             path.turn(self._radius, *args, **kwargs)
+#         self._path_is_empty = False
+#         self._draw()
+
+#     @property
+#     def length(self):
+#         return self._center_path.length
 
 
 class Bondpad(CoplanarShape):
@@ -184,7 +160,7 @@ class Bondpad(CoplanarShape):
         self.add_to_center(path_center)
         self.add_to_outer(path_outer.translate(-self._gap, 0))
         self.add_to_ground(path_ground.translate(-3 * self._gap, 0))
-        self.translate(-path_center.x, -path_center.y)
-        self.add_reference("END", (0, 0))
-        super()._draw()
+
+    def _define_references(self, shape):
+        shape.add_reference("END", [self._length + self._taper_length, 0])
 
