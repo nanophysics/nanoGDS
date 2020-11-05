@@ -1,6 +1,6 @@
 import gdspy
 import numpy as np
-import mygds
+import nanogds
 
 
 def get_marker_field(
@@ -12,14 +12,14 @@ def get_marker_field(
     layer=0,
     flip=False,
 ):
-    f = mygds.MarkerField(marker_size, 2, 2, size, layer=layer)
+    f = nanogds.MarkerField(marker_size, 2, 2, size, layer=layer)
     f.add_corners()
     n = int(size / pitch)
     f.add(
-        mygds.MarkerField(marker_size, n - 1, n - 1, pitch, label=True, layer=layer),
+        nanogds.MarkerField(marker_size, n - 1, n - 1, pitch, label=True, layer=layer),
         position=(pitch, pitch),
     )
-    f.add(mygds.MarkerField(marker_size, n + 1, n + 1, pitch, layer=layer))
+    f.add(nanogds.MarkerField(marker_size, n + 1, n + 1, pitch, layer=layer))
     for side in connection_sides:
         f.add_connection_points(n_connections, side)
     offsetx = pitch * (n / 2 - 1) if flip else pitch * (n / 2 + 1)
@@ -29,7 +29,7 @@ def get_marker_field(
     return f
 
 
-class MarkersInCorners(mygds.Shape):
+class MarkersInCorners(nanogds.Shape):
     def __init__(
         self,
         chip_size=(8000, 4000),
@@ -46,7 +46,7 @@ class MarkersInCorners(mygds.Shape):
         super().__init__()
 
     def _draw(self):
-        marker = mygds.Marker(self._marker_size, layer=self._layer)
+        marker = nanogds.Marker(self._marker_size, layer=self._layer)
         positions = [
             self._marker_offset,
             (self._chip_size[0] - self._marker_offset[0], self._marker_offset[1],),
@@ -69,7 +69,7 @@ class MarkersInCorners(mygds.Shape):
 def write_numbers(
     bondpad_coords, size=40, offset1=100, offset2=15, chip_width=9000, layer=0
 ):
-    shape = mygds.Shape()
+    shape = nanogds.Shape()
     for i, pos in enumerate(bondpad_coords):
         text = gdspy.Text(f"{i+1}", size)
         if i in range(4):

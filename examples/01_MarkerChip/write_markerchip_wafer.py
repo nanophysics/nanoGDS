@@ -136,6 +136,21 @@ if __name__ == "__main__":
     mask_hf = get_HF_mask()
 
     # ################
+
+    # save individual cells
+
+    lib = nanogds.GDS()
+    lib.add_cell("Markerchip Variant A", markerchip_v2_shape)
+    lib.save("markerchip_variant_A")
+
+    lib = nanogds.GDS()
+    lib.add_cell("Markerchip Variant B", markerchip_v1_shape)
+    lib.save("markerchip_variant_B")
+
+    lib = nanogds.GDS()
+    lib.add_cell("Markerchip HF Mask", mask_hf)
+    lib.save("markerchip_HF_mask")
+
     # ################
     # ################
 

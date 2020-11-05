@@ -8,7 +8,7 @@ Python package for designing simple GDS shapes building on `gdspy`.
 git clone https://github.com/nanophysics/nanoGDS.git
 ...
 cd nanogds
-pip install .
+pip install -e .
 ```
 
 ## Example
@@ -20,9 +20,9 @@ import nanogds
 import gdspy
 
 shape = nanogds.Shape()
-shape.add(nanogds.Rectangle(2, 3))
+shape.add(nanogds.Rectangle(20, 30))
 
-shape.add(nanogds.Rectangle(4, 5), position=(10, 10), angle=45)
+shape.add(nanogds.Rectangle(40, 50), position=(100, 100), angle=45)
 
 ```
 

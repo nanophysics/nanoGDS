@@ -7,7 +7,6 @@ from .reference import Reference
 
 class Shape:
     def __init__(self):
-        self._name = ""
         self._reference = Reference()
         self._shapes = {}
         self.add_reference("ORIGIN", (0, 0))
@@ -84,7 +83,7 @@ class Shape:
         for name, point in element.points.items():
             if name == "ORIGIN":
                 continue
-            new_name = element._name
+            new_name = type(element).__name__.upper()
             if counter is not None:
                 new_name += f" #{counter}"
             new_name += f" {name}"

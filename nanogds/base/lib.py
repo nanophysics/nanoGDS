@@ -8,25 +8,30 @@ from .shape import Shape
 class GDS:
     def __init__(self):
         self._lib = gdspy.GdsLibrary()
-        self._main_cell = self._lib.new_cell("MAIN")
+        self._top_cell = self._lib.new_cell("TOP")
 
-    def add_cell(self, name, shapes, origin=(0, 0)):
-        cell = gdspy.Cell(name)
+    def add(self, name, shapes, origin=(0, 0)):
+        cell = self._lib.new_cell(name)
         if isinstance(shapes, list):
             for s in shapes:
-                cell = self._add_element_to_cell(cell, s, origin)
+                self._add_to_cell(cell, s, origin)
         else:
-            cell = self._add_element_to_cell(cell, shapes, origin)
-        self._main_cell.add(cell)
+            self._add_to_cell(cell, shapes, origin)
+        cell_ref = gdspy.CellReference(cell)
+        self._top_cell.add(cell_ref)
 
-    def _add_element_to_cell(self, cell, element, origin):
+    def _add_to_cell(self, cell, element, origin):
         element = deepcopy(element)
-        element.translate(origin[0], origin[1])
         if isinstance(element, Shape):
             cell.add(element.shapes)
         else:
             cell.add(element)
         return cell
+
+    def load_gds(self, cell_name, path="eth.gds"):
+        self._lib.read_gds(path)
+        cell_ref = gdspy.CellReference(self._lib.cells[cell_name])
+        self._top_cell.add(cell_ref)
 
     def save(self, name):
         self._lib.write_gds(f"{name}.gds")
@@ -35,7 +40,7 @@ class GDS:
 class FourInchWafer:
     def __init__(
         self,
-        path_to_template="C:\\Users\\maxru\\PhD\\Code\\mygds\\mygds\\resources\\template.gds",
+        path_to_template="C:\\Users\\maxru\\PhD\\Code\\nanogds\\nanogds\\resources\\template.gds",
     ):
         self._lib = gdspy.GdsLibrary(infile=path_to_template)
 
