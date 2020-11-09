@@ -33,6 +33,10 @@ class GDS:
         cell_ref = gdspy.CellReference(self._lib.cells[cell_name])
         self._top_cell.add(cell_ref)
 
+    def translate_cell(self, name, dx, dy):
+        for p in self._lib.cells[name].polygons:
+            p.translate(dx, dy)
+
     def save(self, name):
         self._lib.write_gds(f"{name}.gds")
 
