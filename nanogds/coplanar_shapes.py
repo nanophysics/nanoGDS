@@ -8,23 +8,6 @@ from copy import deepcopy
 PI = np.pi
 
 
-class RectangleCapacitor(CoplanarShape):
-    def __init__(self, x, y, gap):
-        self._x, self._y = x, y
-        self._gap = gap
-        super().__init__()
-
-    def _draw(self):
-        x1, y1 = self._x, self._y
-        x2, y2 = self._x + 2 * self._gap, self._y + 2 * self._gap
-        x3, y3 = self._x + 3 * self._gap, self._y + 3 * self._gap
-
-        self.add_to_center(Rectangle(x1, y1).translate(-x1 / 2, -y1 / 2))
-        self.add_to_outer(Rectangle(x2, y2).translate(-x2 / 2, -y2 / 2))
-        self.add_to_ground(Rectangle(x3, y3).translate(-x3 / 2, -y3 / 2))
-        self.add_reference("CENTER", [0, 0])
-
-
 class CoplanarPath(CoplanarShape):
     def __init__(self, width_center, width_gap, radius):
         self._width_center = width_center
@@ -90,3 +73,62 @@ class Bondpad(CoplanarShape):
         self.add_to_ground(path_ground.translate(-3 * self._gap, 0))
         self.add_reference("END", [self._length + self._taper_length, 0])
 
+
+class RectangleCapacitor(CoplanarShape):
+    def __init__(self, x, y, gap):
+        self._x, self._y = x, y
+        self._gap = gap
+        super().__init__()
+
+    def _draw(self):
+        x1, y1 = self._x, self._y
+        x2, y2 = self._x + 2 * self._gap, self._y + 2 * self._gap
+        x3, y3 = self._x + 3 * self._gap, self._y + 3 * self._gap
+
+        self.add_to_center(Rectangle(x1, y1).translate(-x1 / 2, -y1 / 2))
+        self.add_to_outer(Rectangle(x2, y2).translate(-x2 / 2, -y2 / 2))
+        self.add_to_ground(Rectangle(x3, y3).translate(-x3 / 2, -y3 / 2))
+        self.add_reference("CENTER", [0, 0])
+
+
+class FingerCapacitor(CoplanarShape):
+    def __init__(self, gap=3, finger_length=10, cpw_width=10, cpw_gap=6, buffer=20):
+        self._gap = gap
+        self._finger_length = finger_length
+        self._cpw_width = cpw_width
+        self._cpw_gap = cpw_gap
+        self._buffer = buffer
+        super().__init__()
+
+    def _draw(self):
+        self.add_to_ground(
+            Rectangle(
+                self._finger_length + self._gap + 2 * self._buffer,
+                2 * (self._cpw_width + 2 * self._cpw_gap),
+            ).translate(0, -self._cpw_width - 2 * self._cpw_gap)
+        )
+        self.add_to_outer(
+            Rectangle(
+                self._finger_length + self._gap + 2 * self._buffer,
+                self._cpw_width + 2 * self._cpw_gap,
+            ).translate(0, -self._cpw_width / 2 - self._cpw_gap)
+        )
+        self.add_to_center(
+            Rectangle(self._buffer, self._cpw_width).translate(0, -self._cpw_width / 2)
+        )
+        self.add_to_center(
+            Rectangle(self._buffer, self._cpw_width).translate(
+                self._buffer + self._finger_length + self._gap, -self._cpw_width / 2
+            )
+        )
+        self.add_to_center(
+            Rectangle(self._finger_length, (self._cpw_width - self._gap) / 2).translate(
+                self._buffer, self._gap / 2
+            )
+        )
+        self.add_to_center(
+            Rectangle(self._finger_length, (self._cpw_width - self._gap) / 2).translate(
+                self._buffer + self._gap,
+                -self._gap / 2 - (self._cpw_width - self._gap) / 2,
+            )
+        )

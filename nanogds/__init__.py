@@ -1,4 +1,4 @@
-from .base import GDS, FourInchWafer, Shape
+from .base import GDS, FourInchWafer, Shape, CoplanarShape
 from .shapes import (
     Square,
     Rectangle,
@@ -10,9 +10,4 @@ from .shapes import (
     Lead,
     LeadRow,
 )
-from .coplanar_shapes import (
-    CoplanarShape,
-    CoplanarPath,
-    RectangleCapacitor,
-    Bondpad,
-)
+from .coplanar_shapes import CoplanarPath, RectangleCapacitor, Bondpad, FingerCapacitor
