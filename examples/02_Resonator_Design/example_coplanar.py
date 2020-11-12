@@ -4,32 +4,6 @@ import numpy as np
 PI = np.pi
 
 
-def get_cpw(center_width, gap, radius):
-    path = nanogds.CoplanarPath(center_width, gap, radius)
-    path.segment(500, "-y")
-    path.turn("l")
-    path.segment(1000)
-    path.turn("r")
-    path.segment(500)
-    path.turn("ll")
-    path.segment(500)
-    path.turn("rr")
-    path.segment(500)
-    path.turn("ll")
-    path.segment(500)
-    path.turn("r")
-    path.segment(500)
-    path.turn(-PI / 4)
-    path.segment(500)
-    path.turn(PI / 4)
-    path.segment(500)
-    path.turn(PI / 4)
-    path.segment(500)
-    path.turn(-PI / 4)
-    path.segment(1000)
-    return path
-
-
 if __name__ == "__main__":
 
     CPW_WIDTH = 10
