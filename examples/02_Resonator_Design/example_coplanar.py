@@ -35,9 +35,9 @@ if __name__ == "__main__":
     CPW_WIDTH = 10
     CPW_GAP = 6
     CPW_RADIUS = 100
+    RESONATOR_MEANDER = 1000
 
     shape = nanogds.CoplanarShape()
-
     shape.add_to_ground(nanogds.Rectangle(8000, 2600).translate(500, 2300))
     shape.add_to_outer(nanogds.Rectangle(2500, 500).translate(3250, 4500))
 
@@ -56,11 +56,11 @@ if __name__ == "__main__":
     path2 = nanogds.CoplanarPath(CPW_WIDTH, CPW_GAP, CPW_RADIUS)
     path2.segment(1000, "+x")
     path2.turn("l")
-    path2.segment(500)
+    path2.segment(RESONATOR_MEANDER / 2)
     path2.turn("rr")
-    path2.segment(1000 + 2 * CPW_RADIUS)
+    path2.segment(RESONATOR_MEANDER + 2 * CPW_RADIUS)
     path2.turn("ll")
-    path2.segment(500)
+    path2.segment(RESONATOR_MEANDER / 2)
     path2.turn("r")
     path2.segment(1000)
 
@@ -70,8 +70,8 @@ if __name__ == "__main__":
     path3.segment(800)
 
     # capacitor
-    capacitor1 = nanogds.FingerCapacitor(5, 20, CPW_WIDTH, CPW_GAP, total_length=100)
-    capacitor2 = nanogds.FingerCapacitor(5, 20, CPW_WIDTH, CPW_GAP, total_length=100)
+    capacitor1 = nanogds.FingerCapacitor(3, 20, CPW_WIDTH, CPW_GAP, total_length=100)
+    capacitor2 = nanogds.FingerCapacitor(3, 20, CPW_WIDTH, CPW_GAP, total_length=100)
 
     ### combine coplanar shapes with main shape
     shape.combine(
