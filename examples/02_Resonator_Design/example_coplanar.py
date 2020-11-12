@@ -32,6 +32,10 @@ def get_cpw(center_width, gap, radius):
 
 if __name__ == "__main__":
 
+    CPW_WIDTH = 10
+    CPW_GAP = 6
+    CPW_RADIUS = 100
+
     shape = nanogds.CoplanarShape()
 
     shape.add_to_ground(nanogds.Rectangle(8000, 2600).translate(500, 2300))
@@ -40,26 +44,79 @@ if __name__ == "__main__":
     ### define coplanar shapes to be used
 
     # bondpad
-    bondpad = nanogds.Bondpad(200, 300, 50, 100, 10, 20)
+    bondpad = nanogds.Bondpad(200, 300, 50, 100, CPW_WIDTH, CPW_GAP)
     bondpad.rotate(-PI / 2)
 
     # coplanar waveguide
-    path = get_cpw(10, 20, 80)
+    path1 = nanogds.CoplanarPath(CPW_WIDTH, CPW_GAP, CPW_RADIUS)
+    path1.segment(800, "-y")
+    path1.turn("l")
+    path1.segment(1000)
+
+    path2 = nanogds.CoplanarPath(CPW_WIDTH, CPW_GAP, CPW_RADIUS)
+    path2.segment(1000, "+x")
+    path2.turn("l")
+    path2.segment(500)
+    path2.turn("rr")
+    path2.segment(1000 + 2 * CPW_RADIUS)
+    path2.turn("ll")
+    path2.segment(500)
+    path2.turn("r")
+    path2.segment(1000)
+
+    path3 = nanogds.CoplanarPath(CPW_WIDTH, CPW_GAP, CPW_RADIUS)
+    path3.segment(1000, "+x")
+    path3.turn("l")
+    path3.segment(800)
+
+    # capacitor
+    capacitor1 = nanogds.FingerCapacitor(5, 20, CPW_WIDTH, CPW_GAP, total_length=100)
+    capacitor2 = nanogds.FingerCapacitor(5, 20, CPW_WIDTH, CPW_GAP, total_length=100)
 
     ### combine coplanar shapes with main shape
     shape.combine(
         bondpad,
-        position=[1500, 4200],
+        position=[2000, 4300],
         connect_point=bondpad.points["END"],
         add_refs=True,
+        counter=1,
     )
-    shape.combine(path, position=shape.points["BONDPAD END"], add_refs=True)
     shape.combine(
-        bondpad.rotate(-PI / 2),
-        position=shape.points["COPLANARPATH END"],
+        path1, position=shape.points["BONDPAD #1 END"], add_refs=True, counter=1
+    )
+    shape.combine(
+        capacitor1,
+        position=shape.points["COPLANARPATH #1 END"],
+        add_refs=True,
+        counter=1,
+    )
+    shape.combine(
+        path2,
+        position=shape.points["FINGERCAPACITOR #1 SIDE 2"],
+        add_refs=True,
+        counter=2,
+    )
+    shape.combine(
+        capacitor2,
+        position=shape.points["COPLANARPATH #2 END"],
+        add_refs=True,
+        counter=2,
+    )
+    shape.combine(
+        path3,
+        position=shape.points["FINGERCAPACITOR #2 SIDE 2"],
+        add_refs=True,
+        counter=3,
+    )
+    shape.combine(
+        bondpad,
+        position=shape.points["COPLANARPATH #3 END"],
         connect_point=bondpad.points["END"],
         add_refs=True,
+        counter=2,
     )
+
+    print(f"RESONATOR LENGTH: {round(path2.length)} um\n\n")
 
     print(shape.points)
 

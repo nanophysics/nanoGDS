@@ -92,12 +92,14 @@ class RectangleCapacitor(CoplanarShape):
 
 
 class FingerCapacitor(CoplanarShape):
-    def __init__(self, gap=3, finger_length=10, cpw_width=10, cpw_gap=6, buffer=20):
+    def __init__(
+        self, gap=3, finger_length=10, cpw_width=10, cpw_gap=6, total_length=50
+    ):
         self._gap = gap
         self._finger_length = finger_length
         self._cpw_width = cpw_width
         self._cpw_gap = cpw_gap
-        self._buffer = buffer
+        self._buffer = (total_length - self._gap - self._finger_length) / 2
         super().__init__()
 
     def _draw(self):
@@ -131,4 +133,8 @@ class FingerCapacitor(CoplanarShape):
                 self._buffer + self._gap,
                 -self._gap / 2 - (self._cpw_width - self._gap) / 2,
             )
+        )
+        self.add_reference("SIDE 1", [0, 0])
+        self.add_reference(
+            "SIDE 2", [2 * self._buffer + self._finger_length + self._gap, 0]
         )
