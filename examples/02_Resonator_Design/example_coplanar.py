@@ -25,21 +25,25 @@ if __name__ == "__main__":
     path1 = nanogds.CoplanarPath(CPW_WIDTH, CPW_GAP, CPW_RADIUS)
     path1.segment(800, "-y")
     path1.turn("l")
-    path1.segment(1000)
+    path1.segment(500)
 
     path2 = nanogds.CoplanarPath(CPW_WIDTH, CPW_GAP, CPW_RADIUS)
-    path2.segment(1000, "+x")
+    path2.segment(1800, "+x")
     path2.turn("l")
     path2.segment(RESONATOR_MEANDER / 2)
     path2.turn("rr")
     path2.segment(RESONATOR_MEANDER + 2 * CPW_RADIUS)
     path2.turn("ll")
+    path2.segment(RESONATOR_MEANDER + 2 * CPW_RADIUS)
+    path2.turn("rr")
+    path2.segment(RESONATOR_MEANDER + 2 * CPW_RADIUS)
+    path2.turn("ll")
     path2.segment(RESONATOR_MEANDER / 2)
     path2.turn("r")
-    path2.segment(1000)
+    path2.segment(1800)
 
     path3 = nanogds.CoplanarPath(CPW_WIDTH, CPW_GAP, CPW_RADIUS)
-    path3.segment(1000, "+x")
+    path3.segment(500, "+x")
     path3.turn("l")
     path3.segment(800)
 
@@ -50,7 +54,7 @@ if __name__ == "__main__":
     ### combine coplanar shapes with main shape
     shape.combine(
         bondpad,
-        position=[2000, 4300],
+        position=[1500, 4300],
         connect_point=bondpad.points["END"],
         add_refs=True,
         counter=1,
