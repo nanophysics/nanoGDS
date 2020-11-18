@@ -21,12 +21,15 @@ if __name__ == "__main__":
     layer = 1
     die_size = (9000, 5000)
     gap1 = 200
-    gap2 = 1000
+    gap2_x = 1000
+    gap2_y = 4000
 
     n_x = 10
-    n_y = 6
+    n_y = 4
 
-    width_mask = n_x * die_size[0] + (n_x + 1) * gap2
+    n_copies = 4
+
+    width_mask = n_x * die_size[0] + (n_x + 1) * gap2_x
     width_frame = 5000
 
     w = width_mask + width_frame
@@ -64,10 +67,10 @@ if __name__ == "__main__":
         for j in range(n_y):
             print(letters[i], j + 1)
             coords = (
-                (i - center_i) * (die_size[0] + gap2) + gap2 / 2,
-                (center_j - j) * (3 * die_size[1] + 2 * gap1 + gap2)
+                (i - center_i) * (die_size[0] + gap2_x) + gap2_x / 2,
+                (center_j - j) * (n_copies * die_size[1] + 2 * gap1 + gap2_y)
                 - die_size[1]
-                - gap2 / 2,
+                - gap2_y / 2,
             )
 
             die = gdspy.Cell(f"{letters[i]}{j+1}")
@@ -75,11 +78,11 @@ if __name__ == "__main__":
             cell.add(
                 gdspy.Text(
                     f"{letters[i]}{j+1}",
-                    size=200,
-                    position=[coords[0] - 400, coords[1] + die_size[1] - 200],
+                    size=600,
+                    position=[coords[0], coords[1] + die_size[1] + 200],
                 )
             )
-            for n in range(3):
+            for n in range(n_copies):
                 cell.add(
                     gdspy.CellReference(
                         die, origin=[coords[0], coords[1] - n * (die_size[1] + gap1)]
