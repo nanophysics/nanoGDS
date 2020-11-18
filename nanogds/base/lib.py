@@ -1,7 +1,15 @@
 import gdspy
 import numpy as np
 from copy import deepcopy
+import os
 
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    # Try backported to PY<37 `importlib_resources`.
+    import importlib_resources as pkg_resources
+
+from .. import resources
 from .shape import Shape
 
 
@@ -41,11 +49,11 @@ class GDS:
         self._lib.write_gds(f"{name}.gds")
 
 
-class FourInchWafer:
+class MaskTemplate:
     def __init__(
-        self,
-        path_to_template="C:\\Users\\maxru\\PhD\\Code\\nanogds\\nanogds\\resources\\template.gds",
+        self, template="wafer_template",
     ):
+        path_to_template = os.path.join(resources.__path__[0], template + ".gds")
         self._lib = gdspy.GdsLibrary(infile=path_to_template)
 
     def add_reference(self, name, shape, add_to):

@@ -1,4 +1,4 @@
-from .lib import GDS, FourInchWafer
+from .lib import GDS, MaskTemplate
 from .shape import Shape
 from .coplanar_shape import CoplanarShape
 from .reference import Reference

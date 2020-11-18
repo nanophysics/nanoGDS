@@ -1,4 +1,4 @@
-from .base import GDS, FourInchWafer, Shape, CoplanarShape
+from .base import GDS, MaskTemplate, Shape, CoplanarShape
 from .shapes import (
     Square,
     Rectangle,
