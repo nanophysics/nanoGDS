@@ -8,9 +8,9 @@ if __name__ == "__main__":
     letters = string.ascii_uppercase
 
     for i in range(10):
-        for j in range(6):
+        for j in range(5):
             shape = nanogds.Shape()
-            shape.add(nanogds.Rectangle((j + 1) * 1500, 500 * (i + 1)))
+            shape.add(nanogds.Rectangle(8000, 2500).translate(500, 1250))
             mask.add_reference(
                 f"{letters[i]}{j+1}_SHAPE", shape.shapes, f"{letters[i]}{j+1}"
             )
