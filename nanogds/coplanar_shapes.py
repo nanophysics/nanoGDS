@@ -19,6 +19,7 @@ class CoplanarPath(CoplanarShape):
         self.add_to_center(gdspy.Path(self._width_center))
         self.add_to_outer(gdspy.Path(self._width_center + 2 * self._width_gap))
         self.add_to_ground(gdspy.Path(3 * (self._width_center + 2 * self._width_gap)))
+        self.add_reference("START", [0, 0])
         self.add_reference("END", [self._center[0].x, self._center[0].y])
 
     def segment(self, *args, **kwargs):
@@ -65,12 +66,12 @@ class Bondpad(CoplanarShape):
         path_ground = self._get_path(
             self._width + 6 * self._gap,
             self._taper_width + 6 * self._taper_gap,
-            self._length + 3 * self._gap,
+            self._length + 1.5 * self._gap,
             self._taper_length,
         )
         self.add_to_center(path_center)
         self.add_to_outer(path_outer.translate(-self._gap, 0))
-        self.add_to_ground(path_ground.translate(-3 * self._gap, 0))
+        self.add_to_ground(path_ground.translate(-1.5 * self._gap, 0))
         self.add_reference("END", [self._length + self._taper_length, 0])
 
 
@@ -123,17 +124,20 @@ class FingerCapacitor(CoplanarShape):
                 self._buffer + self._finger_length + self._gap, -self._cpw_width / 2
             )
         )
-        self.add_to_center(
-            Rectangle(self._finger_length, (self._cpw_width - self._gap) / 2).translate(
-                self._buffer, self._gap / 2
+        if self._finger_length > 0:
+            self.add_to_center(
+                Rectangle(
+                    self._finger_length, (self._cpw_width - self._gap) / 2
+                ).translate(self._buffer, self._gap / 2)
             )
-        )
-        self.add_to_center(
-            Rectangle(self._finger_length, (self._cpw_width - self._gap) / 2).translate(
-                self._buffer + self._gap,
-                -self._gap / 2 - (self._cpw_width - self._gap) / 2,
+            self.add_to_center(
+                Rectangle(
+                    self._finger_length, (self._cpw_width - self._gap) / 2
+                ).translate(
+                    self._buffer + self._gap,
+                    -self._gap / 2 - (self._cpw_width - self._gap) / 2,
+                )
             )
-        )
         self.add_reference("SIDE 1", [0, 0])
         self.add_reference(
             "SIDE 2", [2 * self._buffer + self._finger_length + self._gap, 0]
