@@ -16,7 +16,8 @@ from .shape import Shape
 class GDS:
     def __init__(self):
         self._lib = gdspy.GdsLibrary()
-        self._top_cell = self._lib.new_cell("TOP")
+        gdspy.current_library = self._lib
+        self._top_cell = self._lib.new_cell("TOP", overwrite_duplicate=True)
 
     def add(self, name, shapes, origin=(0, 0)):
         cell = self._lib.new_cell(name)
