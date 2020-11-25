@@ -15,21 +15,16 @@ def save_single_design(save_name, shape):
 
 if __name__ == "__main__":
 
-    RESONATOR_MEANDER = 150  # total resonator length 9053 um
+    RESONATOR_MEANDER = 150  # total resonator length 9127 um
 
     MAPPING1 = {
-        "B": [3, 4, 5, 6],
-        "C": [7, 8, 9, 10],
-        "D": [11, 12, 13, 14],
-        "E": [15, 16, 17, 18],
+        "B": [0, 2, 4, 6],
+        "C": [8, 10, 12, 14],
+        "D": [16, 18, 20, 22],
+        "E": [26, 30, 40, 50],
     }
-
-    MAPPING2 = {
-        "F": [3, 4, 5, 6],
-        "G": [7, 8, 9, 10],
-        "H": [11, 12, 13, 14],
-        "I": [15, 16, 17, 18],
-    }
+    MAPPING2 = {"F": [0, 2, 4, 6], "G": [10, 14, 20, 40]}
+    MAPPING3 = {"H": [0, 2, 4, 6], "I": [10, 14, 20, 40]}
 
     mask = nanogds.MaskTemplate("mask_template")
 
@@ -37,7 +32,7 @@ if __name__ == "__main__":
     shape = helpers.get_resonator_shape(
         resonator_meander=RESONATOR_MEANDER,
         finger_length=0,
-        finger_gap=6,
+        finger_gap=9,  # ca. Q_ext = 1e6
         extend_ground=True,
         add_tap1=False,
         add_center_tap=False,
@@ -50,7 +45,7 @@ if __name__ == "__main__":
     shape = helpers.get_resonator_shape(
         resonator_meander=RESONATOR_MEANDER,
         finger_length=0,
-        finger_gap=6,
+        finger_gap=9,  # ca. Q_ext = 1e6
         extend_ground=True,
         add_tap1=True,
         add_tap2=True,
@@ -63,7 +58,7 @@ if __name__ == "__main__":
     shape = helpers.get_resonator_shape(
         resonator_meander=RESONATOR_MEANDER,
         finger_length=0,
-        finger_gap=6,
+        finger_gap=9,  # ca. Q_ext = 1e6
         extend_ground=True,
         add_tap1=True,
         add_tap2=True,
@@ -76,17 +71,20 @@ if __name__ == "__main__":
     shape = helpers.get_resonator_shape(
         resonator_meander=RESONATOR_MEANDER,
         finger_length=0,
-        finger_gap=6,
+        finger_gap=9,  # ca. Q_ext = 1e6
         extend_ground=True,
         add_tap1=True,
         add_center_tap=True,
         add_tap2=True,
         add_ground_connection=True,
+        add_center_ground_connection=True,
     )
     mask.add_reference("A4_SHAPE", shape.shapes, "A4")
     save_single_design("A4", shape)
 
-    # ### COLUMNS B - E       ---     variation of different finger lengths (see MAPPING)
+    ### COLUMNS B - E
+    #   -->     variation of different finger lengths (see MAPPING1)
+    #   -->
     for column, lengths in MAPPING1.items():
         for split, length in zip([f"{column}{i+1}" for i in range(4)], lengths):
             shape = helpers.get_resonator_shape(
@@ -97,11 +95,14 @@ if __name__ == "__main__":
                 add_tap1=True,
                 add_tap2=True,
                 add_center_tap=True,
+                add_ground_connection=False,
             )
             mask.add_reference(f"{split}_SHAPE", shape.shapes, split)
             save_single_design(split, shape)
 
-    # ### COLUMNS F - I       ---     variation of different finger lengths (see MAPPING)
+    ### COLUMNS F - G
+    #   -->     variation of different finger lengths (see MAPPING2)
+    #   -->
     for column, lengths in MAPPING2.items():
         for split, length in zip([f"{column}{i+1}" for i in range(4)], lengths):
             shape = helpers.get_resonator_shape(
@@ -112,13 +113,43 @@ if __name__ == "__main__":
                 add_tap1=True,
                 add_tap2=True,
                 add_center_tap=True,
-                add_ground_connection=True,
+                add_ground_connection=False,
+                add_center_ground_connection=True,
             )
             mask.add_reference(f"{split}_SHAPE", shape.shapes, split)
             save_single_design(split, shape)
 
-    ### J3      ---     HF Mask
-    shape = helpers.get_HF_mask(2000, 1100, 4000, 5000, 2250, slope=1.25)
+    ### COLUMNS H - I
+    #   -->     variation of different finger lengths (see MAPPING3)
+    #   -->
+    for column, lengths in MAPPING3.items():
+        for split, length in zip([f"{column}{i+1}" for i in range(4)], lengths):
+            shape = helpers.get_resonator_shape(
+                resonator_meander=RESONATOR_MEANDER,
+                finger_length=length,
+                finger_gap=3,
+                extend_ground=True,
+                add_tap1=True,
+                add_tap2=True,
+                add_center_tap=True,
+                add_ground_connection=True,
+                add_center_ground_connection=True,
+            )
+            mask.add_reference(f"{split}_SHAPE", shape.shapes, split)
+            save_single_design(split, shape)
+
+    ### J1      ---     HF Mask
+    shape = helpers.get_HF_mask(2000, 1100, 4000, 5000, 2250, center=False)
+    mask.add_reference("J1_SHAPE", shape.shapes, "J1")
+    save_single_design("J1", shape)
+
+    ### J2      ---     HF Mask
+    shape = helpers.get_HF_mask(2000, 1100, 4000, 5000, 2250, center=True)
+    mask.add_reference("J2_SHAPE", shape.shapes, "J2")
+    save_single_design("J2", shape)
+
+    ### J3      ---     EBR Mask
+    shape = helpers.get_EBR_mask(8000, 4500, 500, 0)
     mask.add_reference("J3_SHAPE", shape.shapes, "J3")
     save_single_design("J3", shape)
 

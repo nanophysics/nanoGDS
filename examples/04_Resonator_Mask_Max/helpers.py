@@ -45,6 +45,7 @@ class FingerGateTap(nanogds.CoplanarShape):
         self.add_to_center(
             nanogds.Rectangle(self._w3, -self._l).translate(-self._w3 / 2, 0)
         )
+        self.add_to_center(nanogds.Rectangle(20, 20).translate(-10, -self._l - 10))
 
 
 def get_resonator_shape(
@@ -59,6 +60,7 @@ def get_resonator_shape(
     add_tap2=True,
     add_center_tap=True,
     add_ground_connection=False,
+    add_center_ground_connection=False,
 ):
     CPW_WIDTH = cpw_width
     CPW_GAP = cpw_gap
@@ -68,42 +70,48 @@ def get_resonator_shape(
     shape = nanogds.CoplanarShape()
     shape.add_to_ground(nanogds.Rectangle(7500, 2210).translate(750, 2240))
     if extend_ground:
-        shape.add_to_ground(
-            gdspy.Polygon(
-                [
-                    [3750, 2250],
-                    [3750, 1400],
-                    [4150, 700],
-                    [4150, 50],
-                    [4850, 50],
-                    [4850, 700],
-                    [5250, 1400],
-                    [5250, 2250],
-                ]
-            )
-        )
-        shape.add_to_outer(nanogds.Rectangle(2500, 500).translate(3250, 4500))
+        # shape.add_to_outer(nanogds.Rectangle(2500, 500).translate(3250, 4500))
         shape.add_to_outer(nanogds.Rectangle(60, 60).translate(4170, 2170))
         shape.add_to_outer(nanogds.Rectangle(60, 60).translate(4770, 2170))
         shape.add_to_outer(nanogds.Rectangle(60, 60).translate(4170, 1610))
         shape.add_to_outer(nanogds.Rectangle(60, 60).translate(4770, 1610))
-        shape.add_to_outer(
-            gdspy.Polygon(
-                [
-                    [4350, 150],
-                    [4650, 150],
-                    [4650, 550],
-                    [4550, 700],
-                    [4550, 1750],
-                    [4450, 1750],
-                    [4450, 700],
-                    [4350, 550],
-                ]
+        if add_center_ground_connection:
+            shape.add_to_ground(
+                gdspy.Polygon([[3750, 2250], [3750, 1460], [5250, 1460], [5250, 2250],])
             )
-        )
+        else:
+            # outline of center bondpad and lead
+            shape.add_to_ground(
+                gdspy.Polygon(
+                    [
+                        [3750, 2250],
+                        [3750, 1400],
+                        [4150, 700],
+                        [4150, 50],
+                        [4850, 50],
+                        [4850, 700],
+                        [5250, 1400],
+                        [5250, 2250],
+                    ]
+                )
+            )
+            shape.add_to_outer(
+                gdspy.Polygon(
+                    [
+                        [4350, 150],
+                        [4650, 150],
+                        [4650, 550],
+                        [4550, 700],
+                        [4550, 1750],
+                        [4450, 1750],
+                        [4450, 700],
+                        [4350, 550],
+                    ]
+                )
+            )
     if add_center_tap:
         shape.add_to_outer(
-            nanogds.Rectangle(400, 600).translate(4500, 2000).translate(-200, -400)
+            nanogds.Rectangle(400, 640).translate(4500, 1960).translate(-200, -400)
         )
         shape.add_to_outer(
             nanogds.Rectangle(20, 100).translate(4500, 2280).translate(-10, -100)
@@ -243,29 +251,32 @@ def get_EBR_mask(width, height, dx, dy):
     return shape
 
 
-def get_HF_mask(width, height, x1, x2, y, slope=1.0):
+def get_HF_mask(width, height, x1, x2, y, center=False):
     shape = nanogds.Shape()
     shape.add(
         gdspy.Polygon(
-            [
-                [x1, y],
-                [x1 - slope * width, y],
-                [x1 - width, y - height],
-                [x1, y - slope * height],
-            ]
+            [[x1, y], [x1 - width, y], [x1 - width, y - height], [x1, y - height],]
         )
     )
     shape.add(
         gdspy.Polygon(
-            [
-                [x2, y],
-                [x2 + slope * width, y],
-                [x2 + width, y - height],
-                [x2, y - slope * height],
-            ]
+            [[x2, y], [x2 + width, y], [x2 + width, y - height], [x2, y - height],]
         )
     )
-    # shape.add(nanogds.Rectangle(-width, -height), position=[x1, y])
-    # shape.add(nanogds.Rectangle(width, -height), position=[x2, y])
+    shape.add(
+        nanogds.Rectangle(100, 120).translate(-50, -120),
+        position=[x1 - 500, y],
+        operation="not",
+    )
+    shape.add(
+        nanogds.Rectangle(100, 120).translate(-50, -120),
+        position=[x2 + 500, y],
+        operation="not",
+    )
+    if center:
+        shape.add(
+            nanogds.Rectangle(1000, 450).translate(-500, 0),
+            position=[4500, y - height],
+        )
     return shape
 
