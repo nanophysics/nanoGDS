@@ -15,7 +15,7 @@ def save_single_design(save_name, shape):
 
 if __name__ == "__main__":
 
-    RESONATOR_MEANDER = 150  # total resonator length 9127 um
+    RESONATOR_MEANDER = 140  # total resonator length 9127 um
 
     MAPPING1 = {
         "B": [0, 2, 4, 6],

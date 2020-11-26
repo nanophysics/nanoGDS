@@ -52,7 +52,7 @@ def get_resonator_shape(
     finger_length=20,
     finger_gap=3,
     cpw_width=10,
-    cpw_gap=6,
+    cpw_gap=6.5,
     cpw_radius=100,
     resonator_meander=150,
     extend_ground=True,
@@ -68,7 +68,7 @@ def get_resonator_shape(
     RESONATOR_MEANDER = resonator_meander
 
     shape = nanogds.CoplanarShape()
-    shape.add_to_ground(nanogds.Rectangle(7500, 2210).translate(750, 2240))
+    shape.add_to_ground(nanogds.Rectangle(7900, 2210).translate(550, 2240))
     if extend_ground:
         # shape.add_to_outer(nanogds.Rectangle(2500, 500).translate(3250, 4500))
         shape.add_to_outer(nanogds.Rectangle(60, 60).translate(4170, 2170))
@@ -113,12 +113,7 @@ def get_resonator_shape(
         shape.add_to_outer(
             nanogds.Rectangle(400, 640).translate(4500, 1960).translate(-200, -400)
         )
-        shape.add_to_outer(
-            nanogds.Rectangle(20, 100).translate(4500, 2280).translate(-10, -100)
-        )
-        shape.add_to_center(
-            nanogds.Rectangle(5, 100).translate(4500, 2280).translate(-2.5, -100)
-        )
+        shape.combine(FingerGateTap(10, 100, 5, 100), position=[4500, 2280])
 
     if add_ground_connection:
         shape.add_to_ground(get_HF_mask(1030, 790, 4000, 5000, 2250))
@@ -140,7 +135,7 @@ def get_resonator_shape(
     path1 = nanogds.CoplanarPath(CPW_WIDTH, CPW_GAP, CPW_RADIUS)
     path1.segment(270, "-y")
     path1.turn("l")
-    path1.segment(1650)
+    path1.segment(2100)
     path1.turn("r")
     path1.segment(800)
 
@@ -181,7 +176,7 @@ def get_resonator_shape(
     ### combine coplanar shapes with main shape
     shape.combine(
         bondpad,
-        position=[1500, 3750],
+        position=[1050, 3750],
         connect_point=bondpad.points["END"],
         add_refs=True,
         counter=1,
