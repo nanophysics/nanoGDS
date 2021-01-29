@@ -91,4 +91,4 @@ if __name__ == "__main__":
 
     lib = gdspy.GdsLibrary()
     lib.add(cell)
-    lib.write_gds("mask_template_smaller.gds")
+    lib.write_gds("mask_template_5x8.gds")
