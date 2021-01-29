@@ -22,7 +22,7 @@ if __name__ == "__main__":
     die_size = (9000, 5000)
     gap1 = 200
     gap2_x = 1250
-    gap2_y = 1000
+    gap2_y = 750
 
     n_x = 5
     n_y = 8
@@ -78,8 +78,8 @@ if __name__ == "__main__":
             cell.add(
                 gdspy.Text(
                     f"{letters[i]}{j+1}",
-                    size=600,
-                    position=[coords[0], coords[1] + die_size[1] + 200],
+                    size=400,
+                    position=[coords[0], coords[1] + die_size[1] + 50],
                 )
             )
             for n in range(n_copies):
