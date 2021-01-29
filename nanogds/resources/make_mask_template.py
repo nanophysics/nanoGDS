@@ -18,19 +18,19 @@ class Angle(nanogds.Shape):
 
 if __name__ == "__main__":
 
-    layer = 1
+    layer = 0
     die_size = (9000, 5000)
     gap1 = 200
-    gap2_x = 1000
-    gap2_y = 4000
+    gap2_x = 1250
+    gap2_y = 1000
 
-    n_x = 10
-    n_y = 4
+    n_x = 5
+    n_y = 8
 
-    n_copies = 4
+    n_copies = 1
 
     width_mask = n_x * die_size[0] + (n_x + 1) * gap2_x
-    width_frame = 5000
+    width_frame = 2000
 
     w = width_mask + width_frame
     frame = nanogds.Rectangle(w, w, layer=layer).translate(-w / 2, -w / 2)
@@ -91,4 +91,4 @@ if __name__ == "__main__":
 
     lib = gdspy.GdsLibrary()
     lib.add(cell)
-    lib.write_gds("mask_template.gds")
+    lib.write_gds("mask_template_smaller.gds")
