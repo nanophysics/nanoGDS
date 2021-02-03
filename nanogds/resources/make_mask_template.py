@@ -20,12 +20,12 @@ if __name__ == "__main__":
 
     layer = 0
     die_size = (9000, 5000)
-    gap1 = 200
+    gap1 = 0
     gap2_x = 1250
-    gap2_y = 750
+    gap2_y = 620
 
     n_x = 5
-    n_y = 8
+    n_y = 9
 
     n_copies = 1
 
@@ -79,7 +79,7 @@ if __name__ == "__main__":
                 gdspy.Text(
                     f"{letters[i]}{j+1}",
                     size=400,
-                    position=[coords[0], coords[1] + die_size[1] + 50],
+                    position=[coords[0] - 750, coords[1] + die_size[1] - 400],
                 )
             )
             for n in range(n_copies):
@@ -91,4 +91,4 @@ if __name__ == "__main__":
 
     lib = gdspy.GdsLibrary()
     lib.add(cell)
-    lib.write_gds("mask_template_5x8.gds")
+    lib.write_gds("mask_template_5x9.gds")
