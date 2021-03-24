@@ -20,7 +20,10 @@ class GDS:
         self._top_cell = self._lib.new_cell("TOP", overwrite_duplicate=True)
 
     def add(self, name, shapes, origin=(0, 0)):
-        cell = self._lib.new_cell(name)
+        if name not in self._lib.cells.keys():
+            cell = self._lib.new_cell(name)
+        else:
+            cell = self._lib.cells[name]
         if isinstance(shapes, list):
             for s in shapes:
                 self._add_to_cell(cell, s, origin)
