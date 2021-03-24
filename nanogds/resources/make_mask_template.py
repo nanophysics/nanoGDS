@@ -21,8 +21,8 @@ if __name__ == "__main__":
     layer = 0
     die_size = (9000, 5000)
     gap1 = 0
-    gap2_x = 1250
-    gap2_y = 620
+    gap2_x = 1000
+    gap2_y = 500
 
     n_x = 5
     n_y = 9
