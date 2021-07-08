@@ -9,5 +9,6 @@ from .shapes import (
     BondpadRow,
     Lead,
     LeadRow,
+    Angle,
 )
 from .coplanar_shapes import CoplanarPath, RectangleCapacitor, Bondpad, FingerCapacitor

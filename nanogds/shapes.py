@@ -55,9 +55,10 @@ class Cross(Shape):
 
 
 class Marker(Shape):
-    def __init__(self, size, layer=0):
+    def __init__(self, size, layer=0, correction=0):
         self._size = size
         self._layer = layer
+        self._correction = correction
         super().__init__()
 
     def _draw(self):
@@ -65,6 +66,49 @@ class Marker(Shape):
             Square(self._size, layer=self._layer), position=(-self._size, -self._size),
         )
         self.add(Square(self._size, layer=self._layer))
+        if self._correction:
+            square = Square(self._correction, layer=self._layer).translate(
+                -self._correction / 2, -self._correction / 2
+            )
+            positions = [
+                (-self._size, 0),
+                (-self._size, -self._size),
+                (self._size, 0),
+                (self._size, self._size),
+                (0, self._size),
+                (0, -self._size),
+            ]
+            for p in positions:
+                self.add(square, position=p)
+            self.add(square, position=(0, 0), operation="not")
+        self.add_reference("CENTER", (0, 0))
+
+
+class Angle(Shape):
+    def __init__(self, width, length, layer=0, correction=0):
+        self._width = width
+        self._length = length
+        self._layer = layer
+        self._correction = correction
+        super().__init__()
+
+    def _draw(self):
+        self.add(Rectangle(self._width, self._length, layer=self._layer))
+        self.add(Rectangle(self._length, self._width, layer=self._layer))
+        if self._correction:
+            square = Square(self._correction, layer=self._layer).translate(
+                -self._correction / 2, -self._correction / 2
+            )
+            positions = [
+                (0, 0),
+                (self._length, 0),
+                (0, self._length),
+                (self._width, self._length),
+                (self._length, self._width),
+            ]
+            for p in positions:
+                self.add(square, position=p)
+            self.add(square, position=(self._width, self._width), operation="not")
         self.add_reference("CENTER", (0, 0))
 
 
@@ -221,9 +265,4 @@ class LeadRow(Shape):
                 layer_bondpad=self._layer_bondpad,
             )
             self.add(lead)
-
-
-
-
-
 

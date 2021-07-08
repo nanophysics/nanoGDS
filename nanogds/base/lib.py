@@ -40,9 +40,11 @@ class GDS:
             cell.add(element)
         return cell
 
-    def load_gds(self, cell_name, path="eth.gds"):
+    def load_gds(self, cell_name, path="eth.gds", origin=(0, 0), rotation=0):
         self._lib.read_gds(path)
-        cell_ref = gdspy.CellReference(self._lib.cells[cell_name])
+        cell_ref = gdspy.CellReference(
+            self._lib.cells[cell_name], origin=origin, rotation=rotation
+        )
         self._top_cell.add(cell_ref)
 
     def translate_cell(self, name, dx, dy):

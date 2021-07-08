@@ -68,7 +68,7 @@ class Shape:
 
     def _add_polygonset(self, element, layer=0, operation="or"):
         operation = operation.lower()
-        if operation not in ["or", "and", "not"]:
+        if operation not in ["or", "and", "not", "xor"]:
             raise Exception(f"Unknown operation '{operation}'")
         if layer not in self._shapes.keys():
             self._shapes[layer] = gdspy.PolygonSet([], layer=layer)  # new layer
