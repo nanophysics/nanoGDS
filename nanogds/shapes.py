@@ -235,9 +235,9 @@ class Lead(Shape):
             path.segment(p, width=w)
         self.add(path, layer=self._layer)
         # add second layer for thicker bondpads
-        path = gdspy.FlexPath([self._path[0]], self._widths[0] - 20)
+        path = gdspy.FlexPath([self._path[0]], self._widths[0] - 10)
         for p, w in zip(self._path[1:3], self._widths[1:3]):
-            path.segment(p, width=w - 20)
+            path.segment(p, width=w - 10)
         self.add(path, layer=self._layer_bondpad)
         # add references
         self.add_reference("START", self._path[0])
