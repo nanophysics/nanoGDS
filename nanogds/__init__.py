@@ -3,6 +3,8 @@ from .shapes import (
     Square,
     Rectangle,
     Cross,
+    Wedge,
+    WedgeMarker,
     Marker,
     MarkerField,
     Bondpad,
