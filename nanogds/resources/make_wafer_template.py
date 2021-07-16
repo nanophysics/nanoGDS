@@ -12,21 +12,21 @@ if __name__ == "__main__":
     radius = 50000
     radius_offset = 500
 
-    die_size = (9000, 5000)
+    die_size = (8000, 4500)
     wafer_mapping = [
-        range(8),
-        range(12),
+        range(4),
+        range(10),
         range(16),
         range(18),
-        range(18),
-        range(18),
+        range(20),
+        range(20),
+        range(20),
+        range(20),
         range(18),
         range(16),
-        range(12),
-        range(8),
+        range(10),
+        range(4),
     ]
-
-    print("TEST")
 
     ring = nanogds.Shape()
     ring.add(
@@ -43,17 +43,25 @@ if __name__ == "__main__":
     )
 
     dicing = nanogds.Shape()
-    cross = nanogds.Cross(1000, 50, layer=layer)
-    dicing.add(cross, position=(0, 0))
-    dicing.add(cross, position=(die_size[0], 0))
-    dicing.add(cross, position=(die_size[0], die_size[1]))
-    dicing.add(cross, position=(0, die_size[1]))
+    angle = nanogds.Angle(500, 50, layer=layer).translate(25, 25)
 
-    cross = nanogds.Cross(1000, 50, layer=layer2)
+    dicing.add(angle, position=(0, 0), angle=0)
+    dicing.add(angle, position=(die_size[0], 0), angle=PI / 2)
+    dicing.add(angle, position=(die_size[0], die_size[1]), angle=PI)
+    dicing.add(angle, position=(0, die_size[1]), angle=-PI / 2)
+    dicing.add(
+        nanogds.Rectangle(die_size[0], die_size[1], layer=layer), operation="xor"
+    )
+
+    cross = nanogds.Cross(1000, 150, layer=layer2)
+    cross.add(nanogds.Cross(1000, 50, layer=layer2), operation="not")
     dicing.add(cross, position=(0, 0))
     dicing.add(cross, position=(die_size[0], 0))
     dicing.add(cross, position=(die_size[0], die_size[1]))
     dicing.add(cross, position=(0, die_size[1]))
+    dicing.add(
+        nanogds.Rectangle(die_size[0], die_size[1], layer=layer2), operation="xor"
+    )
 
     dicing_cell = gdspy.Cell(f"DICING_{die_size[0]}x{die_size[1]}um")
     dicing_cell.add(dicing.shapes)
@@ -73,9 +81,9 @@ if __name__ == "__main__":
             print(letters[i], j + 1)
             coords = ((i - center_i) * die_size[0], (center_j - j - 1) * die_size[1])
             die = gdspy.Cell(f"{letters[i]}{j+1}")
-            die.add(gdspy.CellReference(dicing_cell))
+            # die.add(gdspy.CellReference(dicing_cell))
             cell.add(gdspy.CellReference(die, origin=coords))
 
     lib = gdspy.GdsLibrary()
     lib.add(cell)
-    lib.write_gds("template.gds")
+    lib.write_gds("wafer_template_4x8mm.gds")
