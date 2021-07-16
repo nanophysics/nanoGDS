@@ -1,3 +1,4 @@
+import nanogds
 from .base import Shape, Reference
 
 import gdspy
@@ -36,10 +37,11 @@ class Rectangle(Shape):
 
 
 class Cross(Shape):
-    def __init__(self, size, width, layer=0):
+    def __init__(self, size, width, layer=0, correction=0):
         self._size = size
         self._width = width
         self._layer = layer
+        self._correction = correction
         super().__init__()
 
     def _draw(self):
@@ -52,6 +54,69 @@ class Cross(Shape):
             gdspy.Rectangle((-w / 2, -l / 2), (w / 2, l / 2)), layer=self._layer,
         )
         self.add_reference("CENTER", (0, 0))
+        if self._correction:
+            square = Square(self._correction, layer=self._layer).translate(
+                -self._correction / 2, -self._correction / 2
+            )
+            positions = [
+                (-l / 2, -w / 2),
+                (-l / 2, +w / 2),
+                (+l / 2, +w / 2),
+                (+l / 2, -w / 2),
+                (-l / 2, -w / 2),
+                (-w / 2, -w / 2),
+                (-w / 2, +l / 2),
+                (+w / 2, +l / 2),
+                (+w / 2, -l / 2),
+                (-w / 2, -l / 2),
+            ]
+            for p in positions:
+                self.add(square, position=p)
+            positions = [
+                (-w / 2, -w / 2),
+                (-w / 2, +w / 2),
+                (+w / 2, +w / 2),
+                (+w / 2, -w / 2),
+            ]
+            for p in positions:
+                self.add(square, position=p, operation="not")
+
+
+class Wedge(Shape):
+    def __init__(self, width, length, layer=0):
+        self._width = width
+        self._length = length
+        self._layer = layer
+        super().__init__()
+
+    def _draw(self):
+        w = self._width
+        l = self._length
+        self.add(gdspy.Polygon([(0, 0), (l, w / 2), (l, -w / 2)], layer=self._layer))
+
+
+class WedgeMarker(Shape):
+    def __init__(self, width, length, correction=0, layer=0):
+        self._width = width
+        self._length = length
+        self._correction = correction
+        self._layer = layer
+        super().__init__()
+
+    def _draw(self):
+        w = self._width
+        l = self._length
+        c = self._correction
+        self.add(nanogds.Wedge(w, l, layer=self._layer), angle=0, layer=self._layer)
+        self.add(
+            nanogds.Wedge(w, l, layer=self._layer), angle=PI / 2, layer=self._layer
+        )
+        self.add(
+            nanogds.Wedge(w, l, layer=self._layer), angle=-PI / 2, layer=self._layer
+        )
+        self.add(nanogds.Wedge(w, l, layer=self._layer), angle=PI, layer=self._layer)
+        if c:
+            self.add(nanogds.Square(c), position=(-c / 2, -c / 2), operation="not")
 
 
 class Marker(Shape):
@@ -80,7 +145,6 @@ class Marker(Shape):
             ]
             for p in positions:
                 self.add(square, position=p)
-            self.add(square, position=(0, 0), operation="not")
         self.add_reference("CENTER", (0, 0))
 
 
@@ -113,7 +177,9 @@ class Angle(Shape):
 
 
 class MarkerField(Shape):
-    def __init__(self, size, nx, ny, pitch, pitchy=None, label=False, layer=0):
+    def __init__(
+        self, size, nx, ny, pitch, pitchy=None, correction=0, label=False, layer=0
+    ):
         self._size = size
         self._nx = nx
         self._ny = ny
@@ -121,6 +187,7 @@ class MarkerField(Shape):
         self._pitchy = pitch if pitchy is None else pitchy
         self._with_label = label
         self._layer = layer
+        self._correction = correction
         super().__init__()
 
     def _draw(self):
@@ -128,7 +195,8 @@ class MarkerField(Shape):
             for j in range(self._ny):
                 position = (i * self._pitch, j * self._pitchy)
                 self.add(
-                    Marker(self._size, layer=self._layer), position=position,
+                    Marker(self._size, layer=self._layer, correction=self._correction),
+                    position=position,
                 )
                 self.add_reference(f"MARKER_{i+1}_{j+1}", position)
                 if self._with_label:
