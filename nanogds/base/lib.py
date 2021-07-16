@@ -68,7 +68,7 @@ class MaskTemplate:
         newcell_ref = gdspy.CellReference(newcell)
         counter = 0
         for ref in self._lib.cells["Template"].references:
-            if ref.ref_cell.name in add_to:
+            if ref.ref_cell.name == add_to:
                 ref.ref_cell.add(newcell_ref)
                 counter += 1
                 print(
