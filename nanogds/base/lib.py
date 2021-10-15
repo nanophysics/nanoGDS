@@ -1,6 +1,6 @@
 import gdspy
 import numpy as np
-from copy import deepcopy
+from copy import Error, deepcopy
 import os
 
 try:
@@ -45,6 +45,16 @@ class GDS:
         cell_ref = gdspy.CellReference(
             self._lib.cells[cell_name], origin=origin, rotation=rotation
         )
+        self._top_cell.add(cell_ref)
+
+    def get_cell_from_gds(self, filename, cellname, origin=(0, 0), rotation=0):
+        temp_lib = gdspy.GdsLibrary(infile=filename)
+        if cellname in temp_lib.cells.keys():
+            cell = temp_lib.cells[cellname]
+        else:
+            raise Error(f"File {filename} contains no cell with name {cellname}.")
+        cell_ref = gdspy.CellReference(cell, origin=origin, rotation=rotation)
+        self._lib.add(cell)
         self._top_cell.add(cell_ref)
 
     def translate_cell(self, name, dx, dy):
