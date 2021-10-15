@@ -12,29 +12,31 @@ if __name__ == "__main__":
     radius = 50000
     radius_offset = 500
 
-    die_size = (8000, 4500)
+    die_size = (8000, 5000)
     wafer_mapping = [
-        range(4),
+        # range(8),
         range(10),
-        range(16),
+        range(14),
         range(18),
         range(20),
         range(20),
         range(20),
         range(20),
+        range(20),
+        range(20),
         range(18),
-        range(16),
+        range(14),
         range(10),
-        range(4),
+        # range(8),
     ]
 
     ring = nanogds.Shape()
-    ring.add(
-        gdspy.Round(
-            (0, 0), radius + radius_offset, inner_radius=radius - radius_offset
-        ),
-        layer=layer,
-    )
+    # ring.add(
+    #     gdspy.Round(
+    #         (0, 0), radius + radius_offset, inner_radius=radius - radius_offset
+    #     ),
+    #     layer=layer,
+    # )
     ring.add(
         gdspy.Round(
             (0, 0), radius + radius_offset, inner_radius=radius - radius_offset
@@ -86,4 +88,4 @@ if __name__ == "__main__":
 
     lib = gdspy.GdsLibrary()
     lib.add(cell)
-    lib.write_gds("wafer_template_4x8mm.gds")
+    lib.write_gds("wafer_template_5x8mm.gds")
