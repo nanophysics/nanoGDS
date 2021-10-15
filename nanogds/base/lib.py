@@ -57,6 +57,11 @@ class GDS:
         self._lib.add(cell)
         self._top_cell.add(cell_ref)
 
+    def change_cell_layer(self, cell, layer):
+        cell = self._lib.cells[cell]
+        for p in cell.polygons:
+            p.layers = [layer] * len(p.layers)
+
     def translate_cell(self, name, dx, dy):
         for p in self._lib.cells[name].polygons:
             p.translate(dx, dy)
