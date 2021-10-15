@@ -36,6 +36,14 @@ class Shape:
         self._reference.mirror(p1, p2)
         return self
 
+    def change_layer(self, layer, original_layer=0):
+        if isinstance(layer, int):
+            for shape in self._shapes.values():
+                shape.layers = [layer] * len(shape.layers)
+            self._shapes = {layer: self._shapes[original_layer]}
+        else:
+            raise Error("Layer must be an integer number.")
+
     def add(
         self,
         element,

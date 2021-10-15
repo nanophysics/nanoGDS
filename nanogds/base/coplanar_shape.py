@@ -1,4 +1,5 @@
 import gdspy
+import nanogds
 import numpy as np
 from copy import deepcopy
 
@@ -7,13 +8,14 @@ from .reference import Reference
 
 
 class CoplanarShape:
-    def __init__(self):
+    def __init__(self, layer=0):
         self._reference = Reference()
         self.add_reference("ORIGIN", [0, 0])
         self._center = []
         self._outer = []
         self._ground = []
         self._draw()
+        self._layer = layer
 
     def add_to_center(self, shape):
         self._center.append(shape)
@@ -25,16 +27,16 @@ class CoplanarShape:
         self._ground.append(shape)
 
     def get_shape(self):
-        shape = Shape()
+        shape = nanogds.Shape()
         if self._ground:
             for s in self._ground:
-                shape.add(s)
+                shape.add(s, layer=self._layer)
         if self._outer:
             for s in self._outer:
-                shape.add(s, operation="not")
+                shape.add(s, layer=self._layer, operation="not")
         if self._center:
             for s in self._center:
-                shape.add(s)
+                shape.add(s, layer=self._layer)
         return shape
 
     def combine(
@@ -76,6 +78,20 @@ class CoplanarShape:
         self._reference.mirror(p1, p2)
         return self
 
+    def change_layer(self, layer):
+        if isinstance(layer, int):
+            self._layer = layer
+            for lst in [self._center, self._outer, self._ground]:
+                for s in lst:
+                    if isinstance(s, gdspy.PolygonSet):
+                        s.layers = [layer] * len(s.layers)
+                    elif isinstance(s, nanogds.Shape):
+                        s.change_layer(layer)
+                    else:
+                        raise Error(f"Cannot change the layer of this object: {s}")
+        else:
+            raise Error("Layer must be an integer number.")
+        
     def _merge_references(self, element, counter):
         for name, point in element.points.items():
             if name == "ORIGIN":
