@@ -13,4 +13,12 @@ from .shapes import (
     LeadRow,
     Angle,
 )
-from .coplanar_shapes import CoplanarPath, RectangleCapacitor, Bondpad, FingerCapacitor
+from .coplanar_shapes import (
+    CoplanarPath,
+    RectangleCapacitor,
+    Bondpad,
+    FingerCapacitor,
+    IDFCapacitor,
+    LCFilter,
+    Inductor,
+)
