@@ -1,3 +1,4 @@
+import nanogds
 from .base import CoplanarShape
 from .shapes import Rectangle
 
@@ -18,7 +19,7 @@ class CoplanarPath(CoplanarShape):
     def _draw(self):
         self.add_to_center(gdspy.Path(self._width_center))
         self.add_to_outer(gdspy.Path(self._width_center + 2 * self._width_gap))
-        self.add_to_ground(gdspy.Path(3 * (self._width_center + 2 * self._width_gap)))
+        self.add_to_ground(gdspy.Path(2 * (self._width_center + 2 * self._width_gap)))
         self.add_reference("START", [0, 0])
         self.add_reference("END", [self._center[0].x, self._center[0].y])
 
@@ -75,6 +76,21 @@ class Bondpad(CoplanarShape):
         if self._ground:
             self.add_to_ground(path_ground.translate(-1.5 * self._gap, 0))
         self.add_reference("END", [self._length + self._taper_length, 0])
+
+
+class RectangleBondpad(CoplanarShape):
+    def __init__(self, x, y, gap):
+        self._x, self._y = x, y
+        self._gap = gap
+        super().__init__()
+
+    def _draw(self):
+        x1 = self._x + self._gap
+        y1 = self._y + self._gap
+        self.add_to_outer(nanogds.Rectangle(x1, y1).translate(-x1/2, -y1/2))
+        self.add_to_center(nanogds.Rectangle(self._x, self._y).translate(-self._x/2, -self._y/2))
+        self.translate(0, -self._y/2)
+        self.add_reference("START", [0, 0])
 
 
 class RectangleCapacitor(CoplanarShape):
@@ -158,8 +174,8 @@ class IDFCapacitor(CoplanarShape):
         )
         self.add_to_ground(
             Rectangle(
-                self._l + 3 * self._g, self._n * self._w + self._n * self._g
-            ).translate(-self._g, 0)
+                self._l + 2 * self._g + self._w, self._n * self._w + self._n * self._g
+            ).translate(-self._w, 0)
         )
         for i in range(self._n):
             self.add_to_center(
@@ -167,7 +183,7 @@ class IDFCapacitor(CoplanarShape):
                     ((i + 1) % 2) * self._g, i * (self._w + self._g)
                 )
             )
-        self.translate(self._g, 0)
+        self.translate(self._w/2, 0)
         self.add_reference("BOTTOM", [0, 0])
         self.add_reference("TOP", [0, self._n * self._w + self._n * self._g])
 
@@ -189,7 +205,7 @@ class Inductor(CoplanarShape):
             ).translate(-self._l - 2 * self._g, 0)
         )
 
-        path = gdspy.FlexPath([(0, 0)], 2 * self._w)
+        path = gdspy.FlexPath([(0, 0)], self._w)
         path.segment((0, 2 * self._g), width=self._w, relative=True)
         for i in range(self._n):
             path.segment((-self._l, 0), width=self._w, relative=True)
@@ -197,7 +213,7 @@ class Inductor(CoplanarShape):
             path.segment((2 * self._l, 0), width=self._w, relative=True)
             path.segment((0, self._g), width=self._w, relative=True)
             path.segment((-self._l, 0), width=self._w, relative=True)
-        path.segment((0, 2 * self._g), width=2 * self._w, relative=True)
+        path.segment((0, 2 * self._g), width=self._w, relative=True)
         self.add_to_center(path)
         self.add_reference("BOTTOM", [0, 0])
         self.add_reference("TOP", [0, (2 * self._n + 4) * self._g])
