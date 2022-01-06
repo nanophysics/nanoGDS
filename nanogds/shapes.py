@@ -254,7 +254,7 @@ class MarkerField(Shape):
         [self.add_reference(f"{side.upper()} #{i+1}", p) for i, p in enumerate(points)]
 
 
-class Bondpad(Shape):
+class BondpadShape(Shape):
     def __init__(self, width, height, layer=0):
         self._width = width
         self._height = height
@@ -280,7 +280,7 @@ class BondpadRow(Shape):
 
     def _draw(self):
         for i, x in enumerate(self._positions):
-            bondpad = Bondpad(self._pad_width, self._pad_height, layer=self._layer)
+            bondpad = BondpadShape(self._pad_width, self._pad_height, layer=self._layer)
             self.add(
                 bondpad, position=[x, 0], add_refs=True, counter=i + 1,
             )
