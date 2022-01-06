@@ -26,16 +26,28 @@ class CoplanarShape:
     def add_to_ground(self, shape):
         self._ground.append(shape)
 
-    def get_shape(self):
+    def get_shape(self, verbose=False):
         shape = nanogds.Shape()
         if self._ground:
-            for s in self._ground:
+            if verbose: 
+                print(f"** Adding {len(self._ground)} elements to ground")
+            for i, s in enumerate(self._ground):
+                if verbose and not i%10:
+                    print(f"     * {i} / {len(self._ground)}")
                 shape.add(s, layer=self._layer)
         if self._outer:
-            for s in self._outer:
+            if verbose: 
+                print(f"** Adding {len(self._outer)} elements to outer")
+            for i, s in enumerate(self._outer):
+                if verbose and not i%10:
+                    print(f"     * {i} / {len(self._outer)}")
                 shape.add(s, layer=self._layer, operation="not")
         if self._center:
-            for s in self._center:
+            if verbose: 
+                print(f"** Adding {len(self._center)} elements to center")
+            for i, s in enumerate(self._center):
+                if verbose and not i%10:
+                    print(f"     * {i} / {len(self._center)}")
                 shape.add(s, layer=self._layer)
         return shape
 
