@@ -36,6 +36,11 @@ class Shape:
         self._reference.mirror(p1, p2)
         return self
 
+    def fillet(self, radius):
+        for shape in self._shapes.values():
+            shape.fillet(radius)
+        return self
+
     def change_layer(self, layer, original_layer=0):
         if isinstance(layer, int):
             for shape in self._shapes.values():

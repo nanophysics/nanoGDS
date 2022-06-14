@@ -29,24 +29,24 @@ class CoplanarShape:
     def get_shape(self, verbose=False):
         shape = nanogds.Shape()
         if self._ground:
-            if verbose: 
+            if verbose:
                 print(f"** Adding {len(self._ground)} elements to ground")
             for i, s in enumerate(self._ground):
-                if verbose and not i%10:
+                if verbose and not i % 10:
                     print(f"     * {i} / {len(self._ground)}")
                 shape.add(s, layer=self._layer)
         if self._outer:
-            if verbose: 
+            if verbose:
                 print(f"** Adding {len(self._outer)} elements to outer")
             for i, s in enumerate(self._outer):
-                if verbose and not i%10:
+                if verbose and not i % 10:
                     print(f"     * {i} / {len(self._outer)}")
                 shape.add(s, layer=self._layer, operation="not")
         if self._center:
-            if verbose: 
+            if verbose:
                 print(f"** Adding {len(self._center)} elements to center")
             for i, s in enumerate(self._center):
-                if verbose and not i%10:
+                if verbose and not i % 10:
                     print(f"     * {i} / {len(self._center)}")
                 shape.add(s, layer=self._layer)
         return shape
@@ -90,6 +90,12 @@ class CoplanarShape:
         self._reference.mirror(p1, p2)
         return self
 
+    def fillet(self, radius):
+        for lst in [self._center, self._outer, self._ground]:
+            for s in lst:
+                s.fillet(radius)
+        return self
+
     def change_layer(self, layer):
         if isinstance(layer, int):
             self._layer = layer
@@ -103,7 +109,7 @@ class CoplanarShape:
                         raise Error(f"Cannot change the layer of this object: {s}")
         else:
             raise Error("Layer must be an integer number.")
-        
+
     def _merge_references(self, element, counter):
         for name, point in element.points.items():
             if name == "ORIGIN":
