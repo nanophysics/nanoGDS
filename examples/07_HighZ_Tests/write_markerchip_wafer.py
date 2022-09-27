@@ -11,7 +11,7 @@ RESONATOR_WIDTH = 1
 CPW_GAP = 4
 CPW_RADIUS = 400
 FILLET_RADIUS = 10
-SAVENAME = "20220923_HighZ-Test_3"
+SAVENAME = "20220927_HighZ-Test_4"
 
 
 def save_single_design(save_name, shape):
@@ -20,7 +20,7 @@ def save_single_design(save_name, shape):
     lib.save(f"{save_name}")
 
 
-def get_resonator_shape(length, tap=True, text=None):
+def get_resonator_shape(length, RESONATOR_WIDTH, tap=True, text=None):
     resonator = nanogds.CoplanarPath(RESONATOR_WIDTH, CPW_GAP, 80)
     resonator.segment(length, "+y")
     w = 2 * CPW_GAP + RESONATOR_WIDTH
@@ -55,7 +55,7 @@ def calculate_resonator_prperties(
     text += f"    - C_l: {capacitance_l} F/m\n"
     text += f"    - L_l: {inductance_l} H/m\n"
     text += f"    - Frequency: {freq * 1e-9} GHz\n"
-    text += f"    - Frequency: {np.round(impedance)} Ohm\n"
+    text += f"    - Impedance: {np.round(impedance)} Ohm\n"
     return text
 
 
@@ -131,16 +131,17 @@ if __name__ == "__main__":
     feedline.combine(path)
     feedline.combine(path.mirror([0, 1]))
 
-    coupling_lengths = [20 + i * 20 for i in range(6)]
-    resonator_lengths = [750 + i * 25 for i in range(6)]
+    coupling_lengths = [80 + i * 0 for i in range(6)]
+    resonator_lengths = [650 + i * 25 for i in range(6)]
+    resonator_widths = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
     text = ""
     for i in range(6):
         resonator, text = get_resonator_shape(
-            resonator_lengths[i], tap=False, text=text
+            resonator_lengths[i], resonator_widths[i], tap=False, text=text
         )
-        # resonator.combine(
-        #     get_filter(400, 15, 400).rotate(0), resonator.points["TAP END"],
-        # )
+#        resonator.combine(
+#            get_filter(400, 15, 400).rotate(0), resonator.points["TAP END"],
+#        )
         feedline.combine(
             resonator,
             position=[(i - 2.5) * 700, -FEEDLINE_WIDTH / 2 - CPW_GAP],
@@ -154,33 +155,34 @@ if __name__ == "__main__":
 
     #################################
     # DC lines
-    # dc = nanogds.CoplanarShape()
-    # pitch = 650
-
-    # for i in range(-4, 5):
-    #     path = nanogds.CoplanarPath(15, 30, 0)
-    #     path.segment(300 - abs(i) * 50, "-y")
-    #     if i < 0:
-    #         path.turn("r")
-    #         path.segment(abs(i) * pitch - 50)
-    #         path.turn("l")
-    #         path.segment(abs(i) * 50 + 300)
-    #     elif i > 0:
-    #         path.turn("l")
-    #         path.segment(abs(i) * pitch - 50)
-    #         path.turn("r")
-    #         path.segment(abs(i) * 50 + 300)
-    #     else:
-    #         path.segment(300)
-
-    #     path.combine(get_filter(400, 15, 400), position=path.points["END"])
-    #     dc.combine(path, position=[i * 50, 0])
+#    dc = nanogds.CoplanarShape()
+#    pitch = 650
+#    
+#    for i in range(-4, 5):
+#        path = nanogds.CoplanarPath(15, 30, 0)
+#        path.segment(300 - abs(i) * 50, "-y")
+#        if i < 0:
+#            path.turn("r")
+#            path.segment(abs(i) * pitch - 50)
+#            path.turn("l")
+#            path.segment(abs(i) * 50 + 300)
+#        elif i > 0:
+#            path.turn("l")
+#            path.segment(abs(i) * pitch - 50)
+#            path.turn("r")
+#            path.segment(abs(i) * 50 + 300)
+#        else:
+#            path.segment(300)
+#
+#        path.combine(get_filter(400, 15, 400), position=path.points["END"])
+#        dc.combine(path, position=[i * 50, 0])
 
     shape.combine(feedline, position=[0, 250])
-    # shape.combine(dc, position=[0, -150])
-
-    # shape.add_to_outer(nanogds.Rectangle(540, 240).translate(-270, -170))
-    # shape.add_to_outer(nanogds.Rectangle(240, 240).translate(-120 - 600, -170))
+    
+#    shape.combine(dc, position=[0, -150])
+#
+#    shape.add_to_outer(nanogds.Rectangle(540, 240).translate(-270, -170))
+#    shape.add_to_outer(nanogds.Rectangle(240, 240).translate(-120 - 600, -170))
 
     shape = shape.get_shape(verbose=True)
 
