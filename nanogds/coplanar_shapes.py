@@ -19,7 +19,7 @@ class CoplanarPath(CoplanarShape):
     def _draw(self):
         self.add_to_center(gdspy.Path(self._width_center))
         self.add_to_outer(gdspy.Path(self._width_center + 2 * self._width_gap))
-        self.add_to_ground(gdspy.Path(2 * (self._width_center + 2 * self._width_gap)))
+        self.add_to_ground(gdspy.Path(1.5 * (self._width_center + 2 * self._width_gap)))
         self.add_reference("START", [0, 0])
         self.add_reference("END", [self._center[0].x, self._center[0].y])
 
@@ -39,7 +39,9 @@ class CoplanarPath(CoplanarShape):
 
 
 class Bondpad(CoplanarShape):
-    def __init__(self, width, length, gap, taper_length, taper_width, taper_gap, ground=True):
+    def __init__(
+        self, width, length, gap, taper_length, taper_width, taper_gap, ground=True
+    ):
         self._width = width
         self._length = length
         self._gap = gap
@@ -87,9 +89,11 @@ class RectangleBondpad(CoplanarShape):
     def _draw(self):
         x1 = self._x + self._gap
         y1 = self._y + self._gap
-        self.add_to_outer(nanogds.Rectangle(x1, y1).translate(-x1/2, -y1/2))
-        self.add_to_center(nanogds.Rectangle(self._x, self._y).translate(-self._x/2, -self._y/2))
-        self.translate(0, -self._y/2)
+        self.add_to_outer(nanogds.Rectangle(x1, y1).translate(-x1 / 2, -y1 / 2))
+        self.add_to_center(
+            nanogds.Rectangle(self._x, self._y).translate(-self._x / 2, -self._y / 2)
+        )
+        self.translate(0, -self._y / 2)
         self.add_reference("START", [0, 0])
 
 
@@ -136,7 +140,9 @@ class FingerCapacitor(CoplanarShape):
         )
         if self._buffer > 0:
             self.add_to_center(
-                Rectangle(self._buffer, self._cpw_width).translate(0, -self._cpw_width / 2)
+                Rectangle(self._buffer, self._cpw_width).translate(
+                    0, -self._cpw_width / 2
+                )
             )
             self.add_to_center(
                 Rectangle(self._buffer, self._cpw_width).translate(
@@ -183,7 +189,7 @@ class IDFCapacitor(CoplanarShape):
                     ((i + 1) % 2) * self._g, i * (self._w + self._g)
                 )
             )
-        self.translate(self._w/2, 0)
+        self.translate(self._w / 2, 0)
         self.add_reference("BOTTOM", [0, 0])
         self.add_reference("TOP", [0, self._n * self._w + self._n * self._g])
 
@@ -220,15 +226,18 @@ class Inductor(CoplanarShape):
 
 
 class LCFilter(CoplanarShape):
-    def __init__(self, w, g, l, n_c, n_i):
+    def __init__(self, w, g, l, n_c, n_i, w_i=None, l_i=None):
         self._w, self._g, self._l, self._n_c, self._n_i = w, g, l, n_c, n_i
+        self._w_i = w_i
+        self._l_i = l_i
         super().__init__()
 
     def _draw(self):
         finger_cap = IDFCapacitor(self._w, self._l, self._g, self._n_c)
         self.combine(finger_cap, add_refs=True)
         self.combine(finger_cap.mirror((0, 1)))
-        inductor = Inductor(self._w, self._l, self._g, self._n_i)
+        if self._w_i is not None:
+            inductor = Inductor(self._w_i, self._l_i, self._g, self._n_i)
         self.combine(
             inductor,
             position=self.points["IDFCAPACITOR TOP"],
