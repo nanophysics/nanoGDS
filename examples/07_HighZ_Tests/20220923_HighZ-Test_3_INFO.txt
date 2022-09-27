@@ -1,0 +1,30 @@
+With w = 1.0 um and s = 4.0 um and l = 750.0 um:
+    - C_l: 9.066064523082717e-11 F/m
+    - L_l: 0.00012076357149481726 H/m
+    - Frequency: 6.371348545929812 GHz
+    - Frequency: 1154.0 Ohm
+With w = 1.0 um and s = 4.0 um and l = 775.0 um:
+    - C_l: 9.066064523082717e-11 F/m
+    - L_l: 0.00012076357149481726 H/m
+    - Frequency: 6.165821173480463 GHz
+    - Frequency: 1154.0 Ohm
+With w = 1.0 um and s = 4.0 um and l = 799.9999999999999 um:
+    - C_l: 9.066064523082717e-11 F/m
+    - L_l: 0.00012076357149481726 H/m
+    - Frequency: 5.973139261809199 GHz
+    - Frequency: 1154.0 Ohm
+With w = 1.0 um and s = 4.0 um and l = 825.0 um:
+    - C_l: 9.066064523082717e-11 F/m
+    - L_l: 0.00012076357149481726 H/m
+    - Frequency: 5.792135041754374 GHz
+    - Frequency: 1154.0 Ohm
+With w = 1.0 um and s = 4.0 um and l = 850.0 um:
+    - C_l: 9.066064523082717e-11 F/m
+    - L_l: 0.00012076357149481726 H/m
+    - Frequency: 5.621778128761599 GHz
+    - Frequency: 1154.0 Ohm
+With w = 1.0 um and s = 4.0 um and l = 874.9999999999999 um:
+    - C_l: 9.066064523082717e-11 F/m
+    - L_l: 0.00012076357149481726 H/m
+    - Frequency: 5.461155896511268 GHz
+    - Frequency: 1154.0 Ohm
