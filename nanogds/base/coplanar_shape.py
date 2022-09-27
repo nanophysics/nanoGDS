@@ -8,7 +8,7 @@ from .reference import Reference
 
 
 class CoplanarShape:
-    def __init__(self, layer=0):
+    def __init__(self, layer=0, invert=False):
         self._reference = Reference()
         self.add_reference("ORIGIN", [0, 0])
         self._center = []
@@ -16,6 +16,7 @@ class CoplanarShape:
         self._ground = []
         self._draw()
         self._layer = layer
+        self._invert = invert
 
     def add_to_center(self, shape):
         self._center.append(shape)
@@ -28,27 +29,43 @@ class CoplanarShape:
 
     def get_shape(self, verbose=False):
         shape = nanogds.Shape()
-        if self._ground:
-            if verbose:
-                print(f"** Adding {len(self._ground)} elements to ground")
-            for i, s in enumerate(self._ground):
-                if verbose and not i % 10:
-                    print(f"     * {i} / {len(self._ground)}")
-                shape.add(s, layer=self._layer)
-        if self._outer:
-            if verbose:
-                print(f"** Adding {len(self._outer)} elements to outer")
-            for i, s in enumerate(self._outer):
-                if verbose and not i % 10:
-                    print(f"     * {i} / {len(self._outer)}")
-                shape.add(s, layer=self._layer, operation="not")
-        if self._center:
-            if verbose:
-                print(f"** Adding {len(self._center)} elements to center")
-            for i, s in enumerate(self._center):
-                if verbose and not i % 10:
-                    print(f"     * {i} / {len(self._center)}")
-                shape.add(s, layer=self._layer)
+        if not self._invert:
+            if self._ground:
+                if verbose:
+                    print(f"** Adding {len(self._ground)} elements to ground")
+                for i, s in enumerate(self._ground):
+                    if verbose and not i % 10:
+                        print(f"     * {i} / {len(self._ground)}")
+                    shape.add(s, layer=self._layer)
+            if self._outer:
+                if verbose:
+                    print(f"** Adding {len(self._outer)} elements to outer")
+                for i, s in enumerate(self._outer):
+                    if verbose and not i % 10:
+                        print(f"     * {i} / {len(self._outer)}")
+                    shape.add(s, layer=self._layer, operation="not")
+            if self._center:
+                if verbose:
+                    print(f"** Adding {len(self._center)} elements to center")
+                for i, s in enumerate(self._center):
+                    if verbose and not i % 10:
+                        print(f"     * {i} / {len(self._center)}")
+                    shape.add(s, layer=self._layer)
+        else:
+            if self._outer:
+                if verbose:
+                    print(f"** Adding {len(self._outer)} elements to outer")
+                for i, s in enumerate(self._outer):
+                    if verbose and not i % 10:
+                        print(f"     * {i} / {len(self._outer)}")
+                    shape.add(s, layer=self._layer)
+            if self._center:
+                if verbose:
+                    print(f"** Adding {len(self._center)} elements to center")
+                for i, s in enumerate(self._center):
+                    if verbose and not i % 10:
+                        print(f"     * {i} / {len(self._center)}")
+                    shape.add(s, layer=self._layer, operation="not")
         return shape
 
     def combine(
