@@ -11,7 +11,7 @@ RESONATOR_WIDTH = 1
 CPW_GAP = 4
 CPW_RADIUS = 400
 FILLET_RADIUS = 10
-SAVENAME = "20220927_HighZ-Test_4"
+SAVENAME = "20221005_HighZ-Test_6"
 
 
 def save_single_design(save_name, shape):
@@ -20,14 +20,14 @@ def save_single_design(save_name, shape):
     lib.save(f"{save_name}")
 
 
-def get_resonator_shape(length, RESONATOR_WIDTH, tap=True, text=None):
+def get_resonator_shape(length, RESONATOR_WIDTH, coupling_length, tap=True, text=None):
     resonator = nanogds.CoplanarPath(RESONATOR_WIDTH, CPW_GAP, 80)
     resonator.segment(length, "+y")
     w = 2 * CPW_GAP + RESONATOR_WIDTH
     resonator.add_to_outer(nanogds.Rectangle(w, CPW_GAP).translate(-w / 2, -CPW_GAP))
     resonator.add_to_outer(nanogds.Rectangle(w, CPW_GAP).translate(-w / 2, length))
     text = calculate_resonator_prperties(
-        RESONATOR_WIDTH * 1e-6, CPW_GAP * 1e-6, length * 1e-6, text=text
+        RESONATOR_WIDTH * 1e-6, CPW_GAP * 1e-6, length * 1e-6, coupling_length, text=text
     )
     if tap:
         tap = nanogds.CoplanarPath(3 * RESONATOR_WIDTH, CPW_GAP, 5)
@@ -40,7 +40,7 @@ def get_resonator_shape(length, RESONATOR_WIDTH, tap=True, text=None):
 
 
 def calculate_resonator_prperties(
-    w, g, l, epsilon=11.45, sheet_inductance=125e-12, text=None
+    w, g, l, coupling_length, epsilon=11.45, sheet_inductance=125e-12, text=None
 ):
     epsilon_0 = 8.854e-12
     epsilon_eff = (epsilon + 1) / 2
@@ -51,7 +51,7 @@ def calculate_resonator_prperties(
     inductance_l = mu_0 / 4 * ellipk(k_prime) / ellipk(k) + sheet_inductance / w
     freq = 1 / (2 * l * np.sqrt(capacitance_l * inductance_l))
     impedance = np.sqrt(inductance_l / capacitance_l)
-    text += f"With w = {w * 1e6} um and s = {g * 1e6} um and l = {l * 1e6} um:\n"
+    text += f"With w = {w * 1e6} um and s = {g * 1e6} um and l = {l * 1e6} um and coupling length = {coupling_length} um:\n"
     text += f"    - C_l: {capacitance_l} F/m\n"
     text += f"    - L_l: {inductance_l} H/m\n"
     text += f"    - Frequency: {freq * 1e-9} GHz\n"
@@ -59,7 +59,7 @@ def calculate_resonator_prperties(
     return text
 
 
-def get_coupler_shape(coupling_length, width=30):
+def get_coupler_shape(coupling_length, RESONATOR_WIDTH, width=30):
     shape = nanogds.CoplanarShape()
     shape.combine(
         nanogds.RectangleCapacitor(width, coupling_length, CPW_GAP).translate(
@@ -131,13 +131,13 @@ if __name__ == "__main__":
     feedline.combine(path)
     feedline.combine(path.mirror([0, 1]))
 
-    coupling_lengths = [80 + i * 0 for i in range(6)]
+    coupling_lengths = [80 + i * 10 for i in range(6)]
     resonator_lengths = [650 + i * 20 for i in range(6)]
-    resonator_widths = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+    resonator_widths = [0.75 + i * 0 for i in range(6)]
     text = ""
     for i in range(6):
         resonator, text = get_resonator_shape(
-            resonator_lengths[i], resonator_widths[i], tap=False, text=text
+            resonator_lengths[i], resonator_widths[i], coupling_lengths[i], tap=False, text=text
         )
 #        resonator.combine(
 #            get_filter(400, 15, 400).rotate(0), resonator.points["TAP END"],
@@ -148,7 +148,7 @@ if __name__ == "__main__":
             connect_point=resonator.points["END"],
         )
         feedline.combine(
-            get_coupler_shape(coupling_lengths[i]), position=[(i - 2.5) * 700, 0]
+            get_coupler_shape(coupling_lengths[i], resonator_widths[i]), position=[(i - 2.5) * 700, 0]
         )
     with open(f"{SAVENAME}_INFO.txt", "w") as f:
         f.write(text)
