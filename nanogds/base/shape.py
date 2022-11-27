@@ -41,6 +41,12 @@ class Shape:
             shape.fillet(radius)
         return self
 
+    def offset(self, distance):
+        for key, shape in self._shapes.items():
+            self._shapes[key] = gdspy.offset(shape, distance)
+        #self._reference.offset(distance)
+        return self
+
     def change_layer(self, layer, original_layer=0):
         if isinstance(layer, int):
             for shape in self._shapes.values():
@@ -76,7 +82,7 @@ class Shape:
             self._add_polygonset(element.get_polygons(), layer, operation=operation)
         else:
             raise Exception(
-                "Element to add needs to be either a `Shape` or `gdspy.PolygonSet`"
+                f"Element to add needs to be either a `Shape` or `gdspy.PolygonSet`. This is a {element}"
             )
 
     def _add_polygonset(self, element, layer=0, operation="or"):

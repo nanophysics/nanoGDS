@@ -1,0 +1,30 @@
+With w = 0.7 um and s = 4.0 um and l = 600.0 um and coupling length = 80 um:
+    - C_l: 8.31093451912825e-11 F/m
+    - L_l: 0.00026511866374814445 H/m
+    - Frequency: 5.61401634320549 GHz
+    - Impedance: 1786.0 Ohm
+With w = 0.7 um and s = 4.0 um and l = 580.0 um and coupling length = 100 um:
+    - C_l: 8.31093451912825e-11 F/m
+    - L_l: 0.00026511866374814445 H/m
+    - Frequency: 5.807603113660852 GHz
+    - Impedance: 1786.0 Ohm
+With w = 0.7 um and s = 4.0 um and l = 560.0 um and coupling length = 120 um:
+    - C_l: 8.31093451912825e-11 F/m
+    - L_l: 0.00026511866374814445 H/m
+    - Frequency: 6.015017510577311 GHz
+    - Impedance: 1786.0 Ohm
+With w = 0.75 um and s = 4.0 um and l = 540.0 um and coupling length = 80 um:
+    - C_l: 8.447955533839346e-11 F/m
+    - L_l: 0.0002474861061644565 H/m
+    - Frequency: 6.4036122023720585 GHz
+    - Impedance: 1712.0 Ohm
+With w = 0.75 um and s = 4.0 um and l = 520.0 um and coupling length = 100 um:
+    - C_l: 8.447955533839346e-11 F/m
+    - L_l: 0.0002474861061644565 H/m
+    - Frequency: 6.64990497938637 GHz
+    - Impedance: 1712.0 Ohm
+With w = 0.75 um and s = 4.0 um and l = 500.0 um and coupling length = 120 um:
+    - C_l: 8.447955533839346e-11 F/m
+    - L_l: 0.0002474861061644565 H/m
+    - Frequency: 6.915901178561821 GHz
+    - Impedance: 1712.0 Ohm

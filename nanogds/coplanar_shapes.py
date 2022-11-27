@@ -10,16 +10,17 @@ PI = np.pi
 
 
 class CoplanarPath(CoplanarShape):
-    def __init__(self, width_center, width_gap, radius):
+    def __init__(self, width_center, width_gap, radius, ground_offset):
         self._width_center = width_center
         self._width_gap = width_gap
         self._radius = radius
+        self._ground_offset = ground_offset
         super().__init__()
 
     def _draw(self):
         self.add_to_center(gdspy.Path(self._width_center))
         self.add_to_outer(gdspy.Path(self._width_center + 2 * self._width_gap))
-        self.add_to_ground(gdspy.Path(1.5 * (self._width_center + 2 * self._width_gap)))
+        self.add_to_ground(gdspy.Path(2 * self._ground_offset + (self._width_center + 2 * self._width_gap)))
         self.add_reference("START", [0, 0])
         self.add_reference("END", [self._center[0].x, self._center[0].y])
 
@@ -40,7 +41,7 @@ class CoplanarPath(CoplanarShape):
 
 class Bondpad(CoplanarShape):
     def __init__(
-        self, width, length, gap, taper_length, taper_width, taper_gap, ground=True
+        self, width, length, gap, taper_length, taper_width, taper_gap, ground_offset
     ):
         self._width = width
         self._length = length
@@ -48,7 +49,7 @@ class Bondpad(CoplanarShape):
         self._taper_length = taper_length
         self._taper_width = taper_width
         self._taper_gap = taper_gap
-        self._ground = ground
+        self._ground_offset = ground_offset
         super().__init__()
 
     def _get_path(self, w1, w2, l1, l2):
@@ -68,45 +69,49 @@ class Bondpad(CoplanarShape):
             self._taper_length,
         )
         path_ground = self._get_path(
-            self._width + 4 * self._taper_gap,
-            self._taper_width + self._taper_gap,
-            self._length + 1.5 * self._gap,
+            self._width + 2 * self._gap + 2 * self._ground_offset,
+            self._taper_width + 2 * self._taper_gap + 2 * self._ground_offset,
+            self._length + self._gap + self._ground_offset,
             self._taper_length,
         )
         self.add_to_center(path_center)
         self.add_to_outer(path_outer.translate(-self._gap, 0))
-        if self._ground:
-            self.add_to_ground(path_ground.translate(-1.5 * self._gap, 0))
+        self.add_to_ground(path_ground.translate(- self._gap - self._ground_offset, 0))
         self.add_reference("END", [self._length + self._taper_length, 0])
 
 
 class RectangleBondpad(CoplanarShape):
-    def __init__(self, x, y, gap):
+    def __init__(self, x, y, gap, ground_offset):
         self._x, self._y = x, y
         self._gap = gap
+        self._ground_offset = ground_offset
         super().__init__()
 
     def _draw(self):
-        x1 = self._x + self._gap
-        y1 = self._y + self._gap
+        x1 = self._x + 2 * self._gap
+        y1 = self._y + 2 * self._gap
+        x2 = x1 + 2 * self._ground_offset
+        y2 = y1 + 2 * self._ground_offset
         self.add_to_outer(nanogds.Rectangle(x1, y1).translate(-x1 / 2, -y1 / 2))
         self.add_to_center(
             nanogds.Rectangle(self._x, self._y).translate(-self._x / 2, -self._y / 2)
         )
+        self.add_to_ground(nanogds.Rectangle(x2, y2).translate(-x2 /2, -y2 /2))
         self.translate(0, -self._y / 2)
         self.add_reference("START", [0, 0])
 
 
 class RectangleCapacitor(CoplanarShape):
-    def __init__(self, x, y, gap):
+    def __init__(self, x, y, gap, ground_offset):
         self._x, self._y = x, y
         self._gap = gap
+        self._ground_offset = ground_offset
         super().__init__()
 
     def _draw(self):
         x1, y1 = self._x, self._y
         x2, y2 = self._x + 2 * self._gap, self._y + 2 * self._gap
-        x3, y3 = self._x + 3 * self._gap, self._y + 3 * self._gap
+        x3, y3 = self._x + 2 * self._gap + 2 * self._ground_offset, self._y + 2 * self._gap + 2 * self._ground_offset
 
         self.add_to_center(Rectangle(x1, y1).translate(-x1 / 2, -y1 / 2))
         self.add_to_outer(Rectangle(x2, y2).translate(-x2 / 2, -y2 / 2))
@@ -195,21 +200,24 @@ class IDFCapacitor(CoplanarShape):
 
 
 class Inductor(CoplanarShape):
-    def __init__(self, w, l, g, n):
-        self._w, self._l, self._g, self._n = w, l, 2 * g, n
+    def __init__(self, w, l, g, n, ground_offset):
+        self._w, self._l, self._g, self._n = w, l, g, n
+        self._ground_offset = ground_offset
         super().__init__()
 
     def _draw(self):
-        self.add_to_ground(
-            Rectangle(
-                2 * (self._l + 3 * self._g), (2 * self._n + 4) * self._g,
-            ).translate(-self._l - 2 * self._g, 0)
-        )
-        self.add_to_outer(
-            Rectangle(
-                2 * (self._l + 2 * self._g), (2 * self._n + 4) * self._g
-            ).translate(-self._l - 2 * self._g, 0)
-        )
+        # h = 2 * self._n * self._g + 16
+        # self.add_to_outer(
+        #     Rectangle(
+        #         2 * (self._l + self._g), h
+        #     ).translate(-self._l - self._g, - self._w - h - 80)
+        # )
+        # self.add_to_ground(
+        #     Rectangle(
+        #         2 * (self._l + self._g + self._ground_offset), h + 2 * self._ground_offset,
+        #     ).translate(-self._l - self._g - self._ground_offset,  - self._w - h - 80 - self._ground_offset)
+        # )
+
 
         path = gdspy.FlexPath([(0, 0)], self._w)
         path.segment((0, 2 * self._g), width=self._w, relative=True)

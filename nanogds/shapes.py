@@ -7,6 +7,19 @@ import numpy as np
 PI = np.pi
 
 
+class Circle(Shape):
+    def __init__(self, radius, layer=0):
+        self._radius = radius
+        self._layer = layer
+        super().__init__()
+
+    def _draw(self):
+        self.add(
+            gdspy.Round((0, 0), (self._radius)), layer=self._layer,
+        )
+        self.add_reference("CENTER", (0, 0))
+        
+
 class Square(Shape):
     def __init__(self, size, layer=0):
         self._size = size

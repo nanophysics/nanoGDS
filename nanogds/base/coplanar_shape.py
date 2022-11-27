@@ -5,6 +5,7 @@ from copy import deepcopy
 
 from .shape import Shape
 from .reference import Reference
+from gdspy import clipper
 
 
 class CoplanarShape:
@@ -14,6 +15,7 @@ class CoplanarShape:
         self._center = []
         self._outer = []
         self._ground = []
+        self._holes = []
         self._draw()
         self._layer = layer
         self._invert = invert
@@ -27,6 +29,9 @@ class CoplanarShape:
     def add_to_ground(self, shape):
         self._ground.append(shape)
 
+    def add_to_holes(self, shape):
+        self._holes.append(shape)
+
     def get_shape(self, verbose=False):
         shape = nanogds.Shape()
         if not self._invert:
@@ -36,7 +41,7 @@ class CoplanarShape:
                 for i, s in enumerate(self._ground):
                     if verbose and not i % 10:
                         print(f"     * {i} / {len(self._ground)}")
-                    shape.add(s, layer=self._layer)
+                    shape.add(s)
             if self._outer:
                 if verbose:
                     print(f"** Adding {len(self._outer)} elements to outer")
@@ -52,6 +57,20 @@ class CoplanarShape:
                         print(f"     * {i} / {len(self._center)}")
                     shape.add(s, layer=self._layer)
         else:
+            if self._holes:
+                if verbose:
+                    print(f"** Adding {len(self._holes)} elements to holes")
+                for i, s in enumerate(self._holes):
+                    if verbose and not i % 10:
+                        print(f"     * {i} / {len(self._holes)}")
+                    shape.add(s)
+            if self._ground:
+                if verbose:
+                    print(f"** Adding {len(self._ground)} elements to ground")
+                for i, s in enumerate(self._ground):
+                    if verbose and not i % 10:
+                        print(f"     * {i} / {len(self._ground)}")
+                    shape.add(s, operation="not")
             if self._outer:
                 if verbose:
                     print(f"** Adding {len(self._outer)} elements to outer")
@@ -76,6 +95,8 @@ class CoplanarShape:
         self._center += shape._center
         self._outer += shape._outer
         self._ground += shape._ground
+        self._holes += shape._holes
+
         if add_refs:
             self._merge_references(shape, counter)
 
@@ -112,6 +133,14 @@ class CoplanarShape:
             for s in lst:
                 s.fillet(radius)
         return self
+
+    # offset does not work for coplanar shapes yet - issue with 'Path' object
+    # def offset(self, distance):
+    #     for lst in [self._center, self._outer, self._ground]:
+    #         for s in lst:
+    #             s.offset(distance)
+    #     #self._reference.offset(distance)
+    #     return self
 
     def change_layer(self, layer):
         if isinstance(layer, int):

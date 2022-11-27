@@ -1,5 +1,6 @@
 from .base import GDS, MaskTemplate, Shape, CoplanarShape
 from .shapes import (
+    Circle,
     Square,
     Rectangle,
     Cross,
