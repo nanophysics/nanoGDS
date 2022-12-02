@@ -1,0 +1,5 @@
+With w = 0.75 um and s = 4.0 um and l = 560.0 um and coupling length = 100 um:
+    - C_l: 8.447955533839346e-11 F/m
+    - L_l: 0.0002474861061644565 H/m
+    - Frequency: 6.174911766573056 GHz
+    - Impedance: 1712.0 Ohm
